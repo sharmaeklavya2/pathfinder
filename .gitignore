@@ -1,0 +1,21 @@
+# cache/gen
+*.pyc
+__pycache__/
+/README.html
+/readme.html
+*.class
+*.exe
+
+# local
+output.txt
+secret.txt
+secret/
+/TODO.txt
+/.env
+
+# Trash
+*~
+*.db
+*.sw[po]
+Desktop.ini
+.DS_Store
