@@ -15,18 +15,18 @@ import graph.AbstractGraph;
 
 public class Graph extends AbstractGraph
 {
-    List<Map<Integer, Double>> adj;
+    private List<Map<Integer, Double>> adj;
 
-    public int size() {
+    synchronized public int size() {
         return adj.size();
     }
-    public Map<Integer, Double> getNbrs(int node) {
+    synchronized public Map<Integer, Double> getNbrs(int node) {
         return unmodifiableMap(adj.get(node));
     }
-    public boolean adjacent(int src, int dst) {
+    synchronized public boolean adjacent(int src, int dst) {
         return (src < adj.size() && src >= 0 && adj.get(src).containsKey(dst));
     }
-    public double getWeight(int src, int dst) {
+    synchronized public double getWeight(int src, int dst) {
         return adj.get(src).get(dst);
     }
 
@@ -47,11 +47,11 @@ public class Graph extends AbstractGraph
         for(int i=0; i<n; ++i)
             adj.add(new HashMap<Integer, Double>());
     }
-    public String toString() {
+    synchronized public String toString() {
         return "Graph(" + size() + ", " + adj + ")";
     }
 
-    public void update(Edge e) {
+    synchronized public void update(Edge e) {
         adj.get(e.getSrc()).put(e.getDst(), e.getW());
     }
 
