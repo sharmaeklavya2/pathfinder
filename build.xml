@@ -1,0 +1,23 @@
+<project default="default">
+
+    <target name="clean">
+        <delete>
+            <fileset dir="${basedir}">
+                <include name="**/*.class"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="build-gridpanel">
+        <javac destdir=".">
+            <src path="gridpanel" />
+        </javac>
+    </target>
+
+    <target name="build-graph">
+        <javac destdir=".">
+            <src path="graph" />
+        </javac>
+    </target>
+    
+</project>
