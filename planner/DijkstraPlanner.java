@@ -10,7 +10,7 @@ import static java.lang.Math.abs;
 import graph.AbstractGraph;
 import graph.Graph;
 import graph.Edge;
-import planner.AbstractPlanner;
+import planner.AbstractAdjacentPlanner;
 import planner.Stage;
 
 import java.io.BufferedReader;
@@ -41,7 +41,7 @@ class PQElem implements Comparable<PQElem>
     }
 }
 
-public class DijkstraPlanner extends AbstractPlanner
+public class DijkstraPlanner extends AbstractAdjacentPlanner
 {
     private Stage stage[];
     private double dist[];
@@ -112,33 +112,7 @@ public class DijkstraPlanner extends AbstractPlanner
         return changed;
     }
 
-    public List<Integer> getPath(int u)
-    {
-        List<Integer> l = new ArrayList<Integer>();
-        if(next[u] == -1)
-            return l;
-        while(u != goal) {
-            l.add(u);
-            u = next[u];
-        }
-        l.add(goal);
-        return l;
-    }
-
-    public void move() throws Exception
-    {
-        if(curr == goal)
-            throw new Exception("Already at goal");
-        boolean changed = checkAndUpdate();
-        if(changed)
-            replan();
-        if(next[curr] == -1)
-            throw new Exception("No path to destination");
-        distance += graphLocal.getWeight(curr, next[curr]);
-        curr = next[curr];
-    }
-
-    public void replan()
+    public long replan()
     {
         System.err.println("Replanning");
         for(int i=0; i < graphLocal.size(); ++i)
@@ -152,7 +126,9 @@ public class DijkstraPlanner extends AbstractPlanner
         next[goal] = goal;
         pq = new PriorityQueue<PQElem>();
         pq.add(new PQElem(goal, dist[goal]));
-        while(!pq.isEmpty())
+
+        long pops;
+        for(pops = 0; !pq.isEmpty(); ++pops)
         {
             PQElem head = pq.poll();
             int u = head.getValue();
@@ -192,6 +168,7 @@ public class DijkstraPlanner extends AbstractPlanner
         for(int i=0; i<graphLocal.size(); ++i)
             System.out.print(" " + dist[i]);
         */
+        return pops;
     }
 
     public static void main(String[] args) throws Exception
@@ -207,19 +184,24 @@ public class DijkstraPlanner extends AbstractPlanner
         }
 
         Graph graph = Graph.fromFile(args[0], true);
-        DijkstraPlanner djpl = new DijkstraPlanner(0, 7, graph);
-        System.out.println("Path: " + djpl.getPath(djpl.getCurr()));
+        AbstractAdjacentPlanner planner = new DijkstraPlanner(0, 7, graph);
+        System.out.println("Path: " + planner.getPath(planner.getCurr()));
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        long total_replan_time = 0;
 
-        while(djpl.getCurr() != djpl.getGoal()) {
+        while(planner.getCurr() != planner.getGoal()) {
+            System.out.print("> ");
+            System.out.flush();
             String[] words = br.readLine().split(" ");
             if(words.length > 0) {
                 if(words[0].equals("move")) {
-                    djpl.move();
-                    System.out.println("Path: " + djpl.getPath(djpl.getCurr()));
+                    long time_taken = planner.move();
+                    System.out.println("Replanning time: " + time_taken);
+                    System.out.println("Path: " + planner.getPath(planner.getCurr()));
+                    total_replan_time += time_taken;
                 }
                 else if(words[0].equals("local")) {
-                    System.out.println("Local graph: " + djpl.getLocalGraphStr());
+                    System.out.println("Local graph: " + planner.getLocalGraphStr());
                 }
                 else if(words[0].equals("update")) {
                     int u = Integer.parseInt(words[1]);
@@ -235,6 +217,7 @@ public class DijkstraPlanner extends AbstractPlanner
             }
         }
         System.out.println("Goal reached!");
-        System.out.println("Distance travelled: " + djpl.getDistance());
+        System.out.println("Distance travelled: " + planner.getDistance());
+        System.out.println("Replanning time: " + total_replan_time);
     }
 }

@@ -18,7 +18,7 @@ abstract class AbstractPlanner
 
     public abstract void reset(int curr);
     public abstract boolean checkAndUpdate() throws Exception;
-    public abstract void replan();
+    public abstract long replan();
 
-    public abstract void move() throws Exception;
+    public abstract long move() throws Exception;
 }
