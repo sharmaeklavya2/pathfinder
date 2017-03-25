@@ -8,16 +8,14 @@
         </delete>
     </target>
 
-    <target name="build-gridpanel">
-        <javac destdir=".">
+    <target name="build">
+        <javac destdir="." debug="true">
             <src path="gridpanel" />
+            <src path="graph" />
+            <src path="planner" />
+            <src path="driver" />
+            <src path="util" />
         </javac>
     </target>
 
-    <target name="build-graph">
-        <javac destdir=".">
-            <src path="graph" />
-        </javac>
-    </target>
-    
 </project>
