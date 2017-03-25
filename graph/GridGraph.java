@@ -51,7 +51,7 @@ public class GridGraph extends AbstractGraph
         return "GridGraph(" + rows + ", " + cols + ")";
     }
 
-    synchronized public Map<Integer, Double> getNbrs(int u) {
+    synchronized public Map<Integer, Double> getNbrsCopy(int u) {
         Map<Integer, Double> hm = new HashMap<Integer, Double>(8);
         int ui = u / cols, uj = u % cols;
         int[] drows = {-1, 0, 1};
@@ -73,6 +73,9 @@ public class GridGraph extends AbstractGraph
             }
         }
         return hm;
+    }
+    public Map<Integer, Double> getNbrs(int u) {
+        return getNbrsCopy(u);
     }
 
     public GridGraph(int rows, int cols, int[] types) {

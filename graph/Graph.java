@@ -26,7 +26,7 @@ public class Graph extends AbstractGraph
     synchronized public Map<Integer, Double> getNbrs(int node) {
         return unmodifiableMap(adj.get(node));
     }
-    synchronized public HashMap<Integer, Double> getNbrsCopy(int node) {
+    synchronized public Map<Integer, Double> getNbrsCopy(int node) {
         return new HashMap<Integer, Double>(adj.get(node));
     }
     synchronized public boolean adjacent(int src, int dst) {
