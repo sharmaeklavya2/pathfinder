@@ -69,7 +69,7 @@ public class DijkstraPlanner extends AbstractAdjacentPlanner
         if(curr < 0 || curr >= graphRemote.size())
             throw new IllegalArgumentException("Parameter curr has invalid value " + curr);
         this.distance = 0;
-        this.graphLocal = graphRemote.getGraph();
+        this.graphLocal = graphRemote.toGraph();
         this.curr = curr;
         replan();
     }

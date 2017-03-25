@@ -12,5 +12,7 @@ public abstract class AbstractGraph
     public abstract double getWeight(int src, int dst);
     public abstract String toString();
 
-    public abstract Graph getGraph();
+    synchronized public Graph toGraph() {
+        return new Graph(this);
+    }
 }

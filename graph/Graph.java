@@ -72,9 +72,6 @@ public class Graph extends AbstractGraph
         adj.get(u).remove(v);
     }
 
-    synchronized public Graph getGraph() {
-        return new Graph(this);
-    }
     public static Graph fromBufferedReader(BufferedReader br, boolean symmetric) throws IOException
     {
         int n = Integer.parseInt(br.readLine());
