@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import graph.Edge;
 import graph.AbstractGraph;
+import util.CmdUtil;
 
 public class Graph extends AbstractGraph
 {
@@ -74,50 +75,35 @@ public class Graph extends AbstractGraph
         adj.get(u).remove(v);
     }
 
-    public static Graph fromBufferedReader(BufferedReader br, boolean symmetric) throws IOException
+    public Graph(BufferedReader br, boolean symmetric) throws IOException
     {
         int n = Integer.parseInt(br.readLine());
+        _size = n;
+        adj = new ArrayList<HashMap<Integer, Double>>(n);
+        for(int i=0; i<n; ++i)
+            adj.add(new HashMap<Integer, Double>());
+
         String s;
         String[] words;
-        Graph graph = new Graph(n);
         while((s = br.readLine()) != null) {
             if(!s.equals("")) {
                 words = s.split(" ");
                 int src = Integer.parseInt(words[0]);
                 int dst = Integer.parseInt(words[1]);
                 double w = Double.parseDouble(words[2]);
-                graph.update(new Edge(src, dst, w), symmetric);
+                update(new Edge(src, dst, w), symmetric);
             }
         }
-        return graph;
     }
-
-    public static Graph fromFile(String path, boolean symmetric) throws IOException
-    {return fromBufferedReader(new BufferedReader(new FileReader(path)), symmetric);}
-
-    public static Graph fromStdin(boolean symmetric) throws IOException
-    {return fromBufferedReader(new BufferedReader(new InputStreamReader(System.in)), symmetric);}
+    public Graph(BufferedReader br) throws IOException {
+        this(br, true);
+    }
 
     public static void main(String[] args) throws IOException
     {
         String usage = "usage: java graphs.Graph [file]";
         boolean symmetric = true;
-        Graph graph;
-        if(args.length == 0) {
-            graph = fromStdin(symmetric);
-            System.out.println(graph.toString());
-        }
-        else if(args.length == 1) {
-            if(args[0].equals("-h") || args[0].equals("--help"))
-                System.out.println(usage);
-            else {
-                graph = fromFile(args[0], symmetric);
-                System.out.println(graph.toString());
-            }
-        }
-        else {
-            System.err.println(usage);
-            System.exit(1);
-        }
+        Graph graph = new Graph(CmdUtil.getBrFromArgs(args, usage, true));
+        System.out.println(graph.toString());
     }
 }

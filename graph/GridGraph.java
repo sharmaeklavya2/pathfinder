@@ -9,6 +9,7 @@ import static java.lang.Math.max;
 
 import graph.AbstractGraph;
 import graph.GridGraphNode;
+import util.CmdUtil;
 
 import java.io.FileReader;
 import java.io.BufferedReader;
@@ -103,7 +104,6 @@ public class GridGraph extends AbstractGraph
         ArrayList<GridGraphNode> gridArray = new ArrayList<GridGraphNode>();
         for(rows = 0; (s = br.readLine()) != null; rows++) {
             s = s.trim();
-            System.err.println("<" + s + ">");
             if(cols != s.length()) {
                 if(cols == -1)
                     cols = s.length();
@@ -123,10 +123,9 @@ public class GridGraph extends AbstractGraph
             grid[i] = gridArray.get(i);
     }
 
-    public GridGraph(String fpath) throws IOException, Exception {
-        this(new BufferedReader(new FileReader(fpath)));
-    }
     public static void main(String[] args) throws IOException, Exception {
-        System.out.println((new GridGraph(args[0])).toGraph().toString());
+        String usage = "usage: java graphs.GridGraph [file]";
+        GridGraph graph = new GridGraph(CmdUtil.getBrFromArgs(args, usage, true));
+        System.out.println(graph.toGraph().toString());
     }
 }
