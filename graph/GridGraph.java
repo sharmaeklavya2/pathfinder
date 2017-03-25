@@ -98,9 +98,10 @@ public class GridGraph extends AbstractGraph
         grid[i * cols + j] = node;
     }
 
-    public GridGraph(BufferedReader br) throws IOException, Exception {
+    public GridGraph(BufferedReader br) throws IOException, GridGraphCreateException {
         String s;
         cols = -1;
+        String zeros = "0-SsGg";
         ArrayList<GridGraphNode> gridArray = new ArrayList<GridGraphNode>();
         for(rows = 0; (s = br.readLine()) != null; rows++) {
             s = s.trim();
@@ -108,12 +109,19 @@ public class GridGraph extends AbstractGraph
                 if(cols == -1)
                     cols = s.length();
                 else
-                    throw new Exception("Rows are of different lengths");
+                    throw new GridGraphCreateException("Rows are of different lengths");
             }
             gridArray.ensureCapacity(cols * (rows + 1));
             for(int j=0; j < cols; ++j) {
                 char ch = s.charAt(j);
-                int type = (ch == '0' || ch == '-') ? 0 : 1;
+                if(ch == ' ') {
+                    throw new GridGraphCreateException("Encountered space while reading GridGraph");
+                int type = 1;
+                for(int i=0; i < zeros.length(); ++i) {
+                    if(ch == zeros.charAt(i)) {
+                        type = 0;
+                        break;
+                    }
                 gridArray.add(new GridGraphNode(type, 1));
             }
         }
@@ -123,7 +131,7 @@ public class GridGraph extends AbstractGraph
             grid[i] = gridArray.get(i);
     }
 
-    public static void main(String[] args) throws IOException, Exception {
+    public static void main(String[] args) throws IOException, GridGraphCreateException {
         String usage = "usage: java graphs.GridGraph [file]";
         GridGraph graph = new GridGraph(CmdUtil.getBrFromArgs(args, usage, true));
         System.out.println(graph.toGraph().toString());
