@@ -36,7 +36,8 @@ public class GridGraph extends AbstractGraph
     }
 
     public boolean adjacent(int src, int dst) {
-        return norm(src, dst) <= 0;
+        long nrm = norm(src, dst);
+        return nrm >= 0 && nrm <= 2;
     }
 
     synchronized public double getWeight(int src, int dst) {
@@ -125,8 +126,8 @@ public class GridGraph extends AbstractGraph
                         type = 0;
                         break;
                     }
-                    gridArray.add(new GridGraphNode(type, 1));
                 }
+                gridArray.add(new GridGraphNode(type, 1));
             }
         }
         grid = new GridGraphNode[gridArray.size()];
