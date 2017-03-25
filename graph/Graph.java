@@ -17,9 +17,10 @@ import graph.AbstractGraph;
 public class Graph extends AbstractGraph
 {
     private List<HashMap<Integer, Double>> adj;
+    private int _size;
 
-    synchronized public int size() {
-        return adj.size();
+    public int size() {
+        return _size;
     }
     synchronized public Map<Integer, Double> getNbrs(int node) {
         return unmodifiableMap(adj.get(node));
@@ -28,7 +29,7 @@ public class Graph extends AbstractGraph
         return new HashMap<Integer, Double>(adj.get(node));
     }
     synchronized public boolean adjacent(int src, int dst) {
-        return (src < adj.size() && src >= 0 && adj.get(src).containsKey(dst));
+        return (src < _size && src >= 0 && adj.get(src).containsKey(dst));
     }
     synchronized public double getWeight(int src, int dst) {
         return adj.get(src).get(dst);
@@ -41,13 +42,14 @@ public class Graph extends AbstractGraph
             update(e, symmetric);
     }
     public Graph(int n) {
+        _size = n;
         adj = new ArrayList<HashMap<Integer, Double>>(n);
         for(int i=0; i<n; ++i)
             adj.add(new HashMap<Integer, Double>());
     }
     public Graph(AbstractGraph graph2) {
         this(graph2.size());
-        for(int u=0; u<adj.size(); ++u) {
+        for(int u=0; u<_size; ++u) {
             for(Map.Entry<Integer, Double> entry: graph2.getNbrs(u).entrySet()) {
                 int v = entry.getKey();
                 double w = entry.getValue();
@@ -57,7 +59,7 @@ public class Graph extends AbstractGraph
     }
 
     synchronized public String toString() {
-        return "Graph(" + adj.size() + ", " + adj + ")";
+        return "Graph(" + _size + ", " + adj + ")";
     }
 
     synchronized public void update(Edge e) {
