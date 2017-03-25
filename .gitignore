@@ -5,6 +5,7 @@ __pycache__/
 /readme.html
 *.class
 *.exe
+.ant-*
 
 # local
 output.txt
