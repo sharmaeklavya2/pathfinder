@@ -130,6 +130,15 @@ public class GridGraph extends AbstractGraph
         _size = rows * cols;
         for(int i=0; i<_size; ++i)
             grid[i] = gridArray.get(i);
+
+        /*
+        for(int i=0; i<rows; ++i) {
+            for(int j=0; j<cols; ++j) {
+                System.err.print(" " + grid[i * cols + j]);
+            }
+            System.err.println();
+        }
+        */
     }
 
     public static void main(String[] args) throws IOException, GridGraphCreateException {

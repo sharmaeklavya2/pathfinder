@@ -80,18 +80,26 @@ public class DijkstraPlanner extends AbstractAdjacentPlanner
     // it cannot handle edge addition
     {
         boolean changed = false;
-        for(Map.Entry<Integer, Double> entry: graphLocal.getNbrs(curr).entrySet()) {
+        boolean debug = false;
+        Map<Integer, Double> nbrs = graphLocal.getNbrsCopy(curr);
+        //System.out.println("nbrs of " + curr + ": " + nbrs);
+        for(Map.Entry<Integer, Double> entry: nbrs.entrySet()) {
             int v = entry.getKey();
             double w = entry.getValue();
             if(!graphRemote.adjacent(curr, v)) {
                 graphLocal.breakEdge(curr, v);
                 changed = true;
+                if(debug)
+                    System.err.println("1: Edge (" + curr + ", " + v + ") was removed");
             }
             else {
                 double wreal = graphRemote.getWeight(curr, v);
                 if(abs(wreal - w) >= PQElem.EPS) {
                     graphLocal.update(new Edge(curr, v, wreal));
                     changed = true;
+                    if(debug)
+                        System.err.println("1: Weight of (" + curr + ", " + v + ")" +
+                            " changed from "+ w + " to " + wreal);
                 }
             }
 
@@ -99,12 +107,17 @@ public class DijkstraPlanner extends AbstractAdjacentPlanner
                 if(!graphRemote.adjacent(v, curr)) {
                     graphLocal.breakEdge(v, curr);
                     changed = true;
+                    if(debug)
+                        System.err.println("2: Edge (" + v + ", " + curr + ") was removed");
                 }
                 else {
                     double wreal = graphRemote.getWeight(v, curr);
                     if(abs(wreal - w) >= PQElem.EPS) {
                         graphLocal.update(new Edge(v, curr, wreal));
                         changed = true;
+                        if(debug)
+                            System.err.println("2: Weight of (" + v + ", " + curr + ")" +
+                                " changed from "+ w + " to " + wreal);
                     }
                 }
             }
