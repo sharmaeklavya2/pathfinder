@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class CmdUtil
 {
-    public static BufferedReader getBrFromArgs(String[] args, String usage, bool allowStdin) {
+    public static BufferedReader getBrFromArgs(String[] args, String usage, boolean allowStdin) {
         if(args.length == 0 && allowStdin)
             return new BufferedReader(new InputStreamReader(System.in));
         else if(args.length == 1) {

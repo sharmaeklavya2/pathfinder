@@ -17,8 +17,8 @@ abstract class AbstractPlanner
     public double getDistance() {return distance;}
 
     public abstract void reset(int curr);
-    public abstract boolean checkAndUpdate() throws Exception;
+    public abstract boolean checkAndUpdate();
     public abstract long replan();
 
-    public abstract long move() throws Exception;
+    public abstract long move();
 }

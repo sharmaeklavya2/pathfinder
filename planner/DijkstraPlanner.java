@@ -74,7 +74,7 @@ public class DijkstraPlanner extends AbstractAdjacentPlanner
         replan();
     }
 
-    public boolean checkAndUpdate() throws Exception
+    public boolean checkAndUpdate()
     // return true if graph was updated
     // this can only handle edge weight change and edge removal
     // it cannot handle edge addition
@@ -169,55 +169,5 @@ public class DijkstraPlanner extends AbstractAdjacentPlanner
             System.out.print(" " + dist[i]);
         */
         return pops;
-    }
-
-    public static void main(String[] args) throws Exception
-    {
-        String usage = "usage: java planner.DijkstraPlanner file";
-        if(args.length != 1) {
-            System.err.println(usage);
-            System.exit(1);
-        }
-        else if(args[0].equals("-h") || args[0].equals("--help")) {
-            System.out.println(usage);
-            System.exit(0);
-        }
-
-        Graph graph = Graph.fromFile(args[0], true);
-        AbstractAdjacentPlanner planner = new DijkstraPlanner(0, 7, graph);
-        System.out.println("Path: " + planner.getPath(planner.getCurr()));
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        long total_replan_time = 0;
-
-        while(planner.getCurr() != planner.getGoal()) {
-            System.out.print("> ");
-            System.out.flush();
-            String[] words = br.readLine().split(" ");
-            if(words.length > 0) {
-                if(words[0].equals("move")) {
-                    long time_taken = planner.move();
-                    System.out.println("Replanning time: " + time_taken);
-                    System.out.println("Path: " + planner.getPath(planner.getCurr()));
-                    total_replan_time += time_taken;
-                }
-                else if(words[0].equals("local")) {
-                    System.out.println("Local graph: " + planner.getLocalGraphStr());
-                }
-                else if(words[0].equals("update")) {
-                    int u = Integer.parseInt(words[1]);
-                    int v = Integer.parseInt(words[2]);
-                    double w = Double.parseDouble(words[3]);
-                    graph.update(new Edge(u, v, w), true);
-                }
-                else if(words[0].equals("break")) {
-                    int u = Integer.parseInt(words[1]);
-                    int v = Integer.parseInt(words[2]);
-                    graph.breakEdge(u, v);
-                }
-            }
-        }
-        System.out.println("Goal reached!");
-        System.out.println("Distance travelled: " + planner.getDistance());
-        System.out.println("Replanning time: " + total_replan_time);
     }
 }

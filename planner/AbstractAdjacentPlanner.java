@@ -24,16 +24,16 @@ public abstract class AbstractAdjacentPlanner extends AbstractPlanner
         return l;
     }
 
-    public long move() throws Exception
+    public long move()
     {
         if(curr == goal)
-            throw new Exception("Already at goal");
+            throw new RuntimeException("Already at goal");
         boolean changed = checkAndUpdate();
         long time_taken = 0;
         if(changed)
             time_taken = replan();
         if(getNext(curr) == -1)
-            throw new Exception("No path to destination");
+            throw new RuntimeException("No path to destination");
         distance += graphLocal.getWeight(curr, getNext(curr));
         curr = getNext(curr);
         return time_taken;

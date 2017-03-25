@@ -94,7 +94,7 @@ public class GridGraph extends AbstractGraph
         }
     }
 
-    synchronized void update(int i, int j, GridGraphNode node) {
+    synchronized public void update(int i, int j, GridGraphNode node) {
         grid[i * cols + j] = node;
     }
 
@@ -114,7 +114,7 @@ public class GridGraph extends AbstractGraph
             gridArray.ensureCapacity(cols * (rows + 1));
             for(int j=0; j < cols; ++j) {
                 char ch = s.charAt(j);
-                if(ch == ' ') {
+                if(ch == ' ')
                     throw new GridGraphCreateException("Encountered space while reading GridGraph");
                 int type = 1;
                 for(int i=0; i < zeros.length(); ++i) {
@@ -122,7 +122,8 @@ public class GridGraph extends AbstractGraph
                         type = 0;
                         break;
                     }
-                gridArray.add(new GridGraphNode(type, 1));
+                    gridArray.add(new GridGraphNode(type, 1));
+                }
             }
         }
         grid = new GridGraphNode[gridArray.size()];
