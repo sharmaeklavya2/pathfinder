@@ -41,26 +41,56 @@ class PQElem implements Comparable<PQElem>
     }
 }
 
-public class DijkstraPlanner extends AbstractAdjacentPlanner
+abstract class DijkstraPlannerHelper extends AbstractAdjacentPlanner
 {
     private Stage stage[];
     private double dist[];
     private int next[];
 
-    private PriorityQueue<PQElem> pq;
-
     public double getDist(int u) {return dist[u];}
     public int getNext(int u) {return next[u];}
     public Stage getStage(int u) {return stage[u];}
 
-    public DijkstraPlanner(int curr, int goal, AbstractGraph graph)
+    protected void setDist(int u, double dist) {
+        this.dist[u] = dist;
+        doCallback(u);
+    }
+    protected void setNext(int u, int next) {
+        this.next[u] = next;
+        doCallback(u);
+    }
+    protected void setStage(int u, Stage stage) {
+        this.stage[u] = stage;
+        doCallback(u);
+    }
+    protected void setDistNextStage(int u, double dist, int next, Stage stage) {
+        this.dist[u] = dist;
+        this.next[u] = next;
+        this.stage[u] = stage;
+        doCallback(u);
+    }
+
+    protected DijkstraPlannerHelper(int curr, int goal, AbstractGraph graph, NodeUpdateCallback callback)
     {
         this.goal = goal;
         this.graphRemote = graph;
         stage = new Stage[graph.size()];
         dist = new double[graph.size()];
         next = new int[graph.size()];
+        this.callback = callback;
         reset(curr);
+    }
+}
+
+public class DijkstraPlanner extends DijkstraPlannerHelper
+{
+    private PriorityQueue<PQElem> pq;
+
+    public DijkstraPlanner(int curr, int goal, AbstractGraph graph, NodeUpdateCallback callback) {
+        super(curr, goal, graph, callback);
+    }
+    public DijkstraPlanner(int curr, int goal, AbstractGraph graph) {
+        super(curr, goal, graph, null);
     }
 
     public void reset(int curr)
@@ -128,17 +158,12 @@ public class DijkstraPlanner extends AbstractAdjacentPlanner
     public long replan()
     {
         System.err.println("Replanning");
-        for(int i=0; i < graphLocal.size(); ++i)
-        {
-            stage[i] = Stage.NEW;
-            dist[i] = Double.POSITIVE_INFINITY;
-            next[i] = -1;
+        for(int i=0; i < graphLocal.size(); ++i) {
+            setDistNextStage(i, Double.POSITIVE_INFINITY, -1, Stage.NEW);
         }
-        dist[goal] = 0;
-        stage[goal] = Stage.OPEN;
-        next[goal] = goal;
+        setDistNextStage(goal, 0, goal, Stage.OPEN);
         pq = new PriorityQueue<PQElem>();
-        pq.add(new PQElem(goal, dist[goal]));
+        pq.add(new PQElem(goal, getDist(goal)));
 
         long pops;
         for(pops = 0; !pq.isEmpty(); ++pops)
@@ -146,40 +171,36 @@ public class DijkstraPlanner extends AbstractAdjacentPlanner
             PQElem head = pq.poll();
             int u = head.getValue();
             double prio = head.getPriority();
-            if(stage[u] == Stage.CLOSED)
+            if(getStage(u) == Stage.CLOSED)
                 continue;
-            else if(stage[u] != Stage.OPEN)
-                throw new RuntimeException("Stage " + stage[u] + " node found in priority queue");
-            else if(abs(prio - dist[u]) >= PQElem.EPS)
+            else if(getStage(u) != Stage.OPEN)
+                throw new RuntimeException("Stage " + getStage(u) + " node found in priority queue");
+            else if(abs(prio - getDist(u)) >= PQElem.EPS)
                 throw new RuntimeException("Mismatch between priority queue ("
-                    + prio + ") and dist[" + u + "] (" + dist[u] + ")");
-            stage[u] = Stage.CLOSED;
+                    + prio + ") and dist[" + u + "] (" + getDist(u) + ")");
+            setStage(u, Stage.CLOSED);
             if(u == curr)
                 break;
 
             for(Map.Entry<Integer, Double> entry: graphLocal.getNbrs(u).entrySet()) {
                 int v = entry.getKey();
                 double w = entry.getValue();
-                if(stage[v] == Stage.NEW) {
-                    stage[v] = Stage.OPEN;
-                    dist[v] = dist[u] + w;
-                    next[v] = u;
-                    pq.add(new PQElem(v, dist[v]));
+                if(getStage(v) == Stage.NEW) {
+                    setDistNextStage(v, getDist(u) + w, u, Stage.OPEN);
+                    pq.add(new PQElem(v, getDist(v)));
                 }
-                else if(stage[v] == Stage.OPEN) {
-                    double dist2 = dist[u] + w;
-                    if(dist2 < dist[v])
-                    {
-                        dist[v] = dist2;
-                        next[v] = u;
-                        pq.add(new PQElem(v, dist[v]));
+                else if(getStage(v) == Stage.OPEN) {
+                    double dist2 = getDist(u) + w;
+                    if(dist2 < getDist(v)) {
+                        setDistNextStage(v, dist2, u, Stage.OPEN);
+                        pq.add(new PQElem(v, dist2));
                     }
                 }
             }
         }
         /*
         for(int i=0; i<graphLocal.size(); ++i)
-            System.out.print(" " + dist[i]);
+            System.out.print(" " + getDist(i));
         */
         return pops;
     }
