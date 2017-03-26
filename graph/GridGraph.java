@@ -2,6 +2,7 @@ package graph;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ArrayList;
 import java.lang.Math;
 import static java.lang.Math.abs;
@@ -109,10 +110,24 @@ public class GridGraph extends AbstractGraph
         grid[i * cols + j] = node;
     }
 
+    public static String zeros = "0-SsGg";
+
+    public static GridGraphNode nodeFromChar(char ch) throws GridGraphCreateException {
+        if(ch == ' ')
+            throw new GridGraphCreateException("Encountered space while reading GridGraph");
+        int type = 1;
+        for(int i=0; i < zeros.length(); ++i) {
+            if(ch == zeros.charAt(i)) {
+                type = 0;
+                break;
+            }
+        }
+        return new GridGraphNode(type, 1);
+    }
+
     public GridGraph(BufferedReader br) throws IOException, GridGraphCreateException {
         String s;
         cols = -1;
-        String zeros = "0-SsGg";
         ArrayList<GridGraphNode> gridArray = new ArrayList<GridGraphNode>();
         for(rows = 0; (s = br.readLine()) != null; rows++) {
             s = s.trim();
@@ -125,16 +140,7 @@ public class GridGraph extends AbstractGraph
             gridArray.ensureCapacity(cols * (rows + 1));
             for(int j=0; j < cols; ++j) {
                 char ch = s.charAt(j);
-                if(ch == ' ')
-                    throw new GridGraphCreateException("Encountered space while reading GridGraph");
-                int type = 1;
-                for(int i=0; i < zeros.length(); ++i) {
-                    if(ch == zeros.charAt(i)) {
-                        type = 0;
-                        break;
-                    }
-                }
-                gridArray.add(new GridGraphNode(type, 1));
+                gridArray.add(nodeFromChar(ch));
             }
         }
         grid = new GridGraphNode[gridArray.size()];
@@ -150,6 +156,23 @@ public class GridGraph extends AbstractGraph
             System.err.println();
         }
         */
+    }
+
+    public GridGraph(List<String> lines) throws GridGraphCreateException {
+        rows = lines.size();
+        cols = lines.get(0).length();
+        for(String line: lines)
+            if(line.length() != cols)
+                    throw new GridGraphCreateException("Rows are of different lengths");
+        _size = rows * cols;
+        grid = new GridGraphNode[_size];
+
+        for(int i=0; i < rows; ++i) {
+            for(int j=0; j < cols; ++j) {
+                char ch = lines.get(i).charAt(j);
+                grid[i * cols + j] = nodeFromChar(ch);
+            }
+        }
     }
 
     public static void main(String[] args) throws IOException, GridGraphCreateException {
