@@ -6,6 +6,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -14,6 +15,30 @@ import gridpanel.GridPanel;
 
 public class Main
 {
+    public static void makeGUI(String title, GridPanel gridPanel, JPanel buttonPanel, JPanel statusPanel) {
+        EventQueue.invokeLater(new Runnable(){
+            @Override
+            public void run() {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (ClassNotFoundException | InstantiationException |
+                    IllegalAccessException | UnsupportedLookAndFeelException ex) {}
+
+                JFrame frame = new JFrame(title);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setLayout(new BorderLayout());
+                frame.add(gridPanel, BorderLayout.CENTER);
+                if(buttonPanel != null)
+                    frame.add(buttonPanel, BorderLayout.EAST);
+                if(statusPanel != null)
+                    frame.add(statusPanel, BorderLayout.SOUTH);
+                frame.pack();
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+            }
+        });
+    }
+
     public static void main2(int rows, int cols)
     {
         GridPanel gridPanel = new GridPanel(rows, cols) {
@@ -38,30 +63,7 @@ public class Main
                 }
             }
         };
-        EventQueue.invokeLater(new Runnable(){
-            @Override
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (ClassNotFoundException | InstantiationException |
-                    IllegalAccessException | UnsupportedLookAndFeelException ex) {}
-
-                JFrame frame = new JFrame("Testing GridPanel");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setLayout(new BorderLayout());
-                frame.add(gridPanel);
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-            }
-        });
-        /*
-        long sum = 0;
-        for(long i=0; i<12345678901l; ++i)
-            sum += i;
-        System.out.println(sum);
-        gridPanel.setCell(0, 0, new GridPanelCell(Color.GREEN));
-        */
+        makeGUI("Testing GridPanel", gridPanel, null, null);
     }
 
     public static void main(String[] args)
