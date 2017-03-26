@@ -146,9 +146,11 @@ public class GridPanel extends JPanel
         g2d.dispose();
     }
 
-    public void setCell(int row, int col, GridPanelCell gpc)
-    {
-        cells[row * cols + col] = gpc.getCopy();
+    public void setCell(int row, int col, GridPanelCell gpc) {
+        setCell(row * cols + col, gpc);
+    }
+    public void setCell(int node, GridPanelCell gpc) {
+        cells[node] = gpc.getCopy();
         needsRepaint = true;
     }
 
