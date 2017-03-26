@@ -12,7 +12,7 @@ public class AdjDriver
 {
     public static void main(String[] args) throws IOException, GridGraphCreateException
     {
-        String usage = "usage: java drivers.AdjacentDriver [file]";
+        String usage = "usage: java driver.AdjacentDriver [file]";
         BufferedReader inbr = new BufferedReader(new InputStreamReader(System.in));
         BufferedReader fbr = CmdUtil.getBrFromArgs(args, usage, true);
 
