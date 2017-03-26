@@ -19,8 +19,11 @@ public class GridPanelCell
     public int getArrowY() {return arrowY;}
 
     public static Color complColor(Color c) {
+        double brightness = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null)[2];
         if(c == Color.BLACK)
             return Color.DARK_GRAY;
+        else if(brightness <= 0.1)
+            return c.brighter();
         else
             return c.darker();
     }
