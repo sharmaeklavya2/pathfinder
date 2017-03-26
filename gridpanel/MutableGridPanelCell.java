@@ -6,10 +6,16 @@ import gridpanel.GridPanelCell;
 
 public class MutableGridPanelCell extends GridPanelCell
 {
-    public void setColor(Color c) {
-        color = c;
+    public void setColor(Color color) {
+        this.color = color;
     }
-    public GridPanelCell clone() {
+    public void setArrowX(int arrowX) {
+        this.arrowX = arrowX;
+    }
+    public void setArrowY(int arrowY) {
+        this.arrowY = arrowY;
+    }
+    public GridPanelCell getCopy() {
         return new GridPanelCell(this);
     }
 }

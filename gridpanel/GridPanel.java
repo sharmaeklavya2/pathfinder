@@ -137,25 +137,10 @@ public class GridPanel extends JPanel
         }
 
         for(int i=0; i<cells.length; ++i)
-        {
-            g2d.setColor(cells[i].getColor());
-            g2d.fill(rects[i]);
-        }
+            cells[i].draw1(g2d, rects[i], i == mouseCellIndex);
 
-        if (mouseCellIndex != -1) {
-            Rectangle rect = rects[mouseCellIndex];
-            Color c = cells[mouseCellIndex].getColor(), c2;
-            if(c == Color.BLACK)
-                g2d.setColor(Color.DARK_GRAY);
-            else
-                g2d.setColor(c.darker());
-            g2d.fill(rect);
-        }
-
-        g2d.setColor(Color.GRAY);
-        for (Rectangle rect: rects) {
-            g2d.draw(rect);
-        }
+        for(int i=0; i<cells.length; ++i)
+            cells[i].draw2(g2d, rects[i], i == mouseCellIndex);
 
         needsRepaint = false;
         g2d.dispose();
@@ -163,7 +148,7 @@ public class GridPanel extends JPanel
 
     public void setCell(int row, int col, GridPanelCell gpc)
     {
-        cells[row * cols + col] = gpc.clone();
+        cells[row * cols + col] = gpc.getCopy();
         needsRepaint = true;
     }
 

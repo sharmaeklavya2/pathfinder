@@ -35,6 +35,13 @@ public class GridGraph extends AbstractGraph
             return -1;
     }
 
+    public int diffI(int u, int v) {
+        return v / cols - u / cols;
+    }
+    public int diffJ(int u, int v) {
+        return v % cols - u % cols;
+    }
+
     public boolean adjacent(int src, int dst) {
         long nrm = norm(src, dst);
         return nrm >= 0 && nrm <= 2;
