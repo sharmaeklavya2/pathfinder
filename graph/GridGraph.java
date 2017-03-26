@@ -26,6 +26,15 @@ public class GridGraph extends AbstractGraph
     public int getRows() {return rows;}
     public int getCols() {return cols;}
     public int size() {return _size;}
+    public GridGraphNode getNode(int i, int j) {return grid[i * cols + j];}
+    public GridGraphNode getNode(int u) {return grid[u];}
+
+    public GridGraphUpdateCallback getCallback() {
+        return updateCallback;
+    }
+    public void setCallback(GridGraphUpdateCallback callback) {
+        this.updateCallback = callback;
+    }
 
     synchronized public long norm(int src, int dst) {
         int si = src / cols, sj = src % cols;
@@ -88,7 +97,7 @@ public class GridGraph extends AbstractGraph
         return getNbrsCopy(u);
     }
 
-    public GridGraph(int rows, int cols, int[] types, GridGraphUpdateCallback callback) {
+    public GridGraph(int rows, int cols, int[] types) {
         this.rows = rows;
         this.cols = cols;
         this._size = rows * cols;
@@ -97,22 +106,14 @@ public class GridGraph extends AbstractGraph
         for(int i=0; i < types.length; ++i) {
             grid[i] = new GridGraphNode(types[i], 1);
         }
-        this.updateCallback = callback;
     }
-    public GridGraph(int rows, int cols, int[] types) {
-        this(rows, cols, types, null);
-    }
-    public GridGraph(int rows, int cols, GridGraphUpdateCallback callback) {
+    public GridGraph(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
         this._size = rows * cols;
         for(int i=0; i < _size; ++i) {
             grid[i] = new GridGraphNode(0, 1);
         }
-        this.updateCallback = callback;
-    }
-    public GridGraph(int rows, int cols) {
-        this(rows, cols, (GridGraphUpdateCallback)null);
     }
 
     synchronized public void update(int i, int j, GridGraphNode node) {

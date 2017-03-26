@@ -17,8 +17,11 @@ abstract class AbstractPlanner
     public int getCurr() {return curr;}
     public String getLocalGraphStr() {return graphLocal.toString();}
     public double getDistance() {return distance;}
-    public NodeUpdateCallback getCallback() {return callback;}
 
+    public NodeUpdateCallback getCallback() {return callback;}
+    public void setCallback(NodeUpdateCallback callback) {
+        this.callback = callback;
+    }
     public void doCallback(int u) {
         if(callback != null)
             callback.run(u);
