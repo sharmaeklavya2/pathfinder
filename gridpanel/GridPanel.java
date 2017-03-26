@@ -28,6 +28,9 @@ public class GridPanel extends JPanel
     private boolean needsRepaint, needsRectsRecalc;
     public static final int timerDelay = 50;
 
+    public int getRows() {return rows;}
+    public int getCols() {return cols;}
+
     public GridPanel(int rows, int cols)
     {
         if(cols <= 0 || rows <= 0)
