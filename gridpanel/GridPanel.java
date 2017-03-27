@@ -160,6 +160,9 @@ public class GridPanel extends JPanel
     public GridPanelCell getCell(int row, int col) {
         return cells[row * cols + col];
     }
+    public GridPanelCell getCell(int node) {
+        return cells[node];
+    }
 
     public void handleClick(int row, int col){}
 }
