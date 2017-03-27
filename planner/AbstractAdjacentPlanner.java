@@ -78,7 +78,7 @@ public abstract class AbstractAdjacentPlanner extends AbstractPlanner
             if(!nodes.contains(u)) {
                 int du = distMap.get(u);
                 nodes.add(u);
-                Map<Integer, Double> nbrs = graphLocal.getNbrs(curr);
+                Map<Integer, Double> nbrs = graphRemote.getNbrs(curr);
                 for(Map.Entry<Integer, Double> entry: nbrs.entrySet()) {
                     int v = entry.getKey();
                     int dv = u + 1;
