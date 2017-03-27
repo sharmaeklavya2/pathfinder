@@ -32,8 +32,20 @@ public class Graph extends AbstractGraph
     synchronized public boolean adjacent(int src, int dst) {
         return (src < _size && src >= 0 && adj.get(src).containsKey(dst));
     }
+
+    public static class NonAdjacentException extends RuntimeException {
+        public NonAdjacentException(String s) {
+            super(s);
+        }
+    }
+
     synchronized public double getWeight(int src, int dst) {
-        return adj.get(src).get(dst);
+        try {
+            return adj.get(src).get(dst);
+        }
+        catch(NullPointerException e) {
+            throw new NonAdjacentException("getWeight(" + src + ", " + dst + ") failed");
+        }
     }
 
     public Graph(int n, Edge[] edges, boolean symmetric) {
