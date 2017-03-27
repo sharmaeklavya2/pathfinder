@@ -50,7 +50,8 @@ public abstract class GUIAdjDriver
         }
     }
 
-    public static void run(String fpath, String plannerType, final int callbackSleep) throws IOException, GridGraphCreateException
+    public static void run(String fpath, String plannerType, final int callbackSleep,
+        int sensorRadius) throws IOException, GridGraphCreateException
     {
         GUIUtil.setlf();
         GridGraph graph;
@@ -125,20 +126,25 @@ public abstract class GUIAdjDriver
 
         // draw buttons panel
         JButton moveButton = new JButton("Move");
-        moveButton.addActionListener(new ActionListener() {
+        class MoveActionListener implements ActionListener {
+            int sensorRadius;
+            public MoveActionListener(int sensorRadius) {
+                this.sensorRadius = sensorRadius;
+            }
             @Override
             public void actionPerformed(ActionEvent e) {
                 (new Thread("move_thread") {
                     @Override
                     public void run() {
                         if(planner.getCurr() != planner.getGoal())
-                            planner.move();
+                            planner.move(sensorRadius);
                         if(planner.getCurr() == planner.getGoal())
                             moveButton.setEnabled(false);
                     }
                 }).start();
             }
-        });
+        }
+        moveButton.addActionListener(new MoveActionListener(sensorRadius));
 
         JButton refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(new ActionListener() {
@@ -186,12 +192,13 @@ public abstract class GUIAdjDriver
     }
 
     public static void main(String[] args) throws IOException, GridGraphCreateException {
-        String usage = "usage: java driver.GUIAdjDriver <fpath> <plannerType> <callbackSleep>";
-        if(args.length == 3) {
+        String usage = "usage: java driver.GUIAdjDriver <fpath> <plannerType> <callbackSleep> <sensorRadius>";
+        if(args.length == 4) {
             String fpath = args[0];
             String plannerType = args[1];
             int callbackSleep = Integer.parseInt(args[2]);
-            run(fpath, plannerType, callbackSleep);
+            int sensorRadius = Integer.parseInt(args[3]);
+            run(fpath, plannerType, callbackSleep, sensorRadius);
         }
         else {
             System.err.println(usage);
