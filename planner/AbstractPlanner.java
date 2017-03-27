@@ -28,7 +28,6 @@ abstract class AbstractPlanner
     }
 
     public abstract void reset(int curr);
-    public abstract boolean checkAndUpdate();
     public abstract long replan();
 
     public abstract long move();

@@ -158,57 +158,6 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
         return new GridPanelCell(color, arrowX, arrowY);
     }
 
-    public boolean checkAndUpdate()
-    // return true if graph was updated
-    // this can only handle edge weight change and edge removal
-    // it cannot handle edge addition
-    {
-        boolean changed = false;
-        boolean debug = false;
-        Map<Integer, Double> nbrs = graphLocal.getNbrsCopy(curr);
-        //System.out.println("nbrs of " + curr + ": " + nbrs);
-        for(Map.Entry<Integer, Double> entry: nbrs.entrySet()) {
-            int v = entry.getKey();
-            double w = entry.getValue();
-            if(!graphRemote.adjacent(curr, v)) {
-                graphLocal.breakEdge(curr, v);
-                changed = true;
-                if(debug)
-                    System.err.println("1: Edge (" + curr + ", " + v + ") was removed");
-            }
-            else {
-                double wreal = graphRemote.getWeight(curr, v);
-                if(abs(wreal - w) >= PQElem.EPS) {
-                    graphLocal.update(new Edge(curr, v, wreal));
-                    changed = true;
-                    if(debug)
-                        System.err.println("1: Weight of (" + curr + ", " + v + ")" +
-                            " changed from "+ w + " to " + wreal);
-                }
-            }
-
-            if(graphLocal.adjacent(v, curr)) {
-                if(!graphRemote.adjacent(v, curr)) {
-                    graphLocal.breakEdge(v, curr);
-                    changed = true;
-                    if(debug)
-                        System.err.println("2: Edge (" + v + ", " + curr + ") was removed");
-                }
-                else {
-                    double wreal = graphRemote.getWeight(v, curr);
-                    if(abs(wreal - w) >= PQElem.EPS) {
-                        graphLocal.update(new Edge(v, curr, wreal));
-                        changed = true;
-                        if(debug)
-                            System.err.println("2: Weight of (" + v + ", " + curr + ")" +
-                                " changed from "+ w + " to " + wreal);
-                    }
-                }
-            }
-        }
-        return changed;
-    }
-
     public long replan()
     {
         System.err.println("Replanning");
