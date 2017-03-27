@@ -169,6 +169,7 @@ public abstract class GUIAdjDriver
                     @Override
                     public void run() {
                         planner.reset(start);
+                        moveButton.setEnabled(true);
                     }
                 }).start();
             }
