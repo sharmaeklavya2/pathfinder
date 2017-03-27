@@ -35,7 +35,10 @@ public abstract class AbstractAdjacentPlanner extends AbstractPlanner
         if(getNext(curr) == -1)
             throw new RuntimeException("No path to destination");
         distance += graphLocal.getWeight(curr, getNext(curr));
+        int old_curr = curr;
         curr = getNext(curr);
+        doCallback(old_curr);
+        doCallback(curr);
         return time_taken;
     }
 }
