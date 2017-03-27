@@ -46,6 +46,9 @@ class PQElem implements Comparable<PQElem>
 
 abstract class DijkstraPlannerHelper extends AbstractAdjacentPlanner
 {
+    public static enum Stage
+    {NEW, OPEN, CLOSED}
+
     private Stage stage[];
     private double dist[];
     private int next[];
