@@ -187,6 +187,24 @@ public class GridGraph extends AbstractGraph
         }
     }
 
+    public String serialize() {
+        char[] a = new char[rows * (cols + 1)];
+        int k = 0;
+        for(int i=0; i<rows; ++i) {
+            for(int j=0; j<cols; ++j) {
+                int type = grid[i*cols + j].getType();
+                if(type == 0) {
+                    a[k++] = '-';
+                }
+                else {
+                    a[k++] = 'O';
+                }
+            }
+            a[k++] = '\n';
+        }
+        return new String(a);
+    }
+
     public static void main(String[] args) throws IOException, GridGraphCreateException {
         String usage = "usage: java graphs.GridGraph [file]";
         GridGraph graph = new GridGraph(CmdUtil.getBrFromArgs(args, usage, true));

@@ -20,6 +20,7 @@ import java.lang.Thread;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.PrintWriter;
 
 public abstract class GUIAdjDriver
 {
@@ -202,11 +203,36 @@ public abstract class GUIAdjDriver
             }
         }
         resetButton.addActionListener(new ResetActionListener(start));
+
+        JButton exportButton = new JButton("Export");
+        exportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.err.println("Export called");
+                (new Thread("export_thread") {
+                    @Override
+                    public void run() {
+                        String fname = "output.txt";
+                        String s = graph.serialize();
+                        try {
+                            PrintWriter writer = new PrintWriter(fname, "UTF-8");
+                            writer.print(s);
+                            writer.close();
+                        }
+                        catch(IOException e) {
+                            System.err.println("Couldn't write to " + fname);
+                        }
+                    }
+                }).start();
+            }
+        });
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.add(moveButton);
         buttonPanel.add(refreshButton);
         buttonPanel.add(resetButton);
+        buttonPanel.add(exportButton);
 
         // draw grid
         GUIUtil.makeGUI("Dijkstra", gridPanel, buttonPanel, null);
