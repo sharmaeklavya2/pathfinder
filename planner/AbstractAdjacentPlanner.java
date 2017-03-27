@@ -13,7 +13,10 @@ public abstract class AbstractAdjacentPlanner extends AbstractPlanner
 {
     public abstract int getNext(int u);
 
-    public abstract GridPanelCell getGridPanelCell(int u);
+    public GridPanelCell getGridPanelCell(int u) {
+        return this.getGridPanelCell(u, false);
+    }
+    public abstract GridPanelCell getGridPanelCell(int u, boolean onPath);
 
     public List<Integer> getPath(int u)
     {

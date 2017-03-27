@@ -110,7 +110,7 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
         replan();
     }
 
-    public GridPanelCell getGridPanelCell(int u) {
+    public GridPanelCell getGridPanelCell(int u, boolean onPath) {
         int v = getNext(u);
         int type = 0;
         Stage stage = getStage(u);
@@ -130,11 +130,19 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
 
         //List<int> path = getPath(getCurr());
         Color color;
-        if(type == 1) {
-            if(stage == Stage.OPEN)
-                color = Color.RED.darker();
-            else
-                color = Color.BLACK;
+        if(type > 0) {
+            if(onPath) {
+                if(stage == Stage.OPEN)
+                    color = Color.MAGENTA.darker();
+                else
+                    color = Color.BLUE.darker();
+            }
+            else {
+                if(stage == Stage.OPEN)
+                    color = Color.RED.darker();
+                else
+                    color = Color.BLACK;
+            }
         }
         else {
             if(u == curr || u == goal) {
@@ -145,14 +153,27 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
                     color = Color.GREEN;
                 }
             }
-            else if(stage == Stage.NEW) {
-                color = Color.LIGHT_GRAY;
-            }
-            else if(stage == Stage.OPEN) {
-                color = new Color(255, 63, 63);
+            else if(onPath) {
+                if(stage == Stage.NEW) {
+                    color = Color.CYAN.darker();
+                }
+                else if(stage == Stage.OPEN) {
+                    color = Color.MAGENTA;
+                }
+                else {
+                    color = Color.CYAN;
+                }
             }
             else {
-                color = Color.WHITE;
+                if(stage == Stage.NEW) {
+                    color = Color.LIGHT_GRAY;
+                }
+                else if(stage == Stage.OPEN) {
+                    color = new Color(255, 63, 63);
+                }
+                else {
+                    color = Color.WHITE;
+                }
             }
         }
         return new GridPanelCell(color, arrowX, arrowY);
@@ -205,6 +226,8 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
         for(int i=0; i<graphLocal.size(); ++i)
             System.out.print(" " + getDist(i));
         */
+        if(getCallback() != null)
+            getCallback().pathDone();
         return pops;
     }
 }

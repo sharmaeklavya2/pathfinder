@@ -119,10 +119,31 @@ public abstract class GUIAdjDriver
                 }
                 catch(InterruptedException e) {}
                 System.err.println("nuc(" + u + ")");
-                gridPanel.setCell(u / gcols, u % gcols, planner.getGridPanelCell(u));
+                gridPanel.setCell(u, planner.getGridPanelCell(u));
+            }
+            @Override
+            public void pathDone() {
+                (new Thread("pathDone_thread") {
+                    @Override
+                    public void run() {
+                        System.err.println("pathDone()");
+                        int curr = planner.getCurr();
+                        if(curr != -1) {
+                            curr = planner.getNext(curr);
+                        }
+                        if(curr != -1) {
+                            int goal = planner.getGoal();
+                            while(curr != goal) {
+                                gridPanel.setCell(curr, planner.getGridPanelCell(curr, true));
+                                curr = planner.getNext(curr);
+                            }
+                        }
+                    }
+                }).start();
             }
         };
         planner.setCallback(nuc);
+        nuc.pathDone();
 
         // draw buttons panel
         JButton moveButton = new JButton("Move");
