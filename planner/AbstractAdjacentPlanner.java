@@ -3,6 +3,7 @@ package planner;
 import java.util.List;
 import java.util.ArrayList;
 
+import gridpanel.GridPanelCell;
 import planner.AbstractPlanner;
 import planner.Stage;
 
@@ -10,6 +11,8 @@ public abstract class AbstractAdjacentPlanner extends AbstractPlanner
 // An abstract planner where a robot only moves to adjacent nodes
 {
     public abstract int getNext(int u);
+
+    public abstract GridPanelCell getGridPanelCell(int u);
 
     public List<Integer> getPath(int u)
     {

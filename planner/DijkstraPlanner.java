@@ -6,9 +6,12 @@ import java.util.Map;
 import java.lang.IllegalArgumentException;
 import java.util.PriorityQueue;
 import static java.lang.Math.abs;
+import java.awt.Color;
 
+import gridpanel.GridPanelCell;
 import graph.AbstractGraph;
 import graph.Graph;
+import graph.GridGraph;
 import graph.Edge;
 import planner.AbstractAdjacentPlanner;
 import planner.Stage;
@@ -102,6 +105,54 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
         this.graphLocal = graphRemote.toGraph();
         this.curr = curr;
         replan();
+    }
+
+    public GridPanelCell getGridPanelCell(int u) {
+        int v = getNext(u);
+        int type = 0;
+        Stage stage = getStage(u);
+        int arrowX = 0, arrowY = 0;
+
+        if(graphRemote instanceof GridGraph) {
+            GridGraph graph = (GridGraph)graphRemote;
+            type = graph.getNode(u).getType();
+            if(v != -1) {
+                arrowX = graph.diffJ(u, v);
+                arrowY = graph.diffI(u, v);
+            }
+            else {
+                arrowX = arrowY = 0;
+            }
+        }
+
+        //List<int> path = getPath(getCurr());
+        Color color;
+        if(type == 1) {
+            if(stage == Stage.OPEN)
+                color = Color.RED.darker();
+            else
+                color = Color.BLACK;
+        }
+        else {
+            if(u == curr || u == goal) {
+                if(u == curr && u == goal) {
+                    color = Color.GREEN.darker();
+                }
+                else {
+                    color = Color.GREEN;
+                }
+            }
+            else if(stage == Stage.NEW) {
+                color = Color.LIGHT_GRAY;
+            }
+            else if(stage == Stage.OPEN) {
+                color = new Color(255, 63, 63);
+            }
+            else {
+                color = Color.WHITE;
+            }
+        }
+        return new GridPanelCell(color, arrowX, arrowY);
     }
 
     public boolean checkAndUpdate()
