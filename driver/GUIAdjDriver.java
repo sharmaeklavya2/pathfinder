@@ -119,7 +119,7 @@ public abstract class GUIAdjDriver
                         Thread.sleep(callbackSleep);
                 }
                 catch(InterruptedException e) {}
-                System.err.println("nuc(" + u + ")");
+                //System.err.println("nuc(" + u + ")");
                 gridPanel.setCell(u, planner.getGridPanelCell(u));
             }
             @Override
