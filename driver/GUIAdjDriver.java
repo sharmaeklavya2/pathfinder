@@ -235,7 +235,7 @@ public abstract class GUIAdjDriver
         buttonPanel.add(exportButton);
 
         // draw grid
-        GUIUtil.makeGUI("Dijkstra", gridPanel, buttonPanel, null);
+        GUIUtil.makeGUI(plannerType, gridPanel, buttonPanel, null);
     }
 
     public static void main(String[] args) throws IOException, GridGraphCreateException {
