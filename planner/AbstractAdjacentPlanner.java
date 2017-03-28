@@ -101,6 +101,16 @@ public abstract class AbstractAdjacentPlanner extends AbstractPlanner
                         queue.add(v);
                     }
                 }
+                // Also add nodes which would have been included if they weren't blocked
+                // but their neighbors shouldn't be blocked.
+                // This enables us to block paths from blocked nodes
+                Map<Integer, Double> lnbrs = graphLocal.getNbrs(u);
+                for(Map.Entry<Integer, Double> entry: lnbrs.entrySet()) {
+                    int v = entry.getKey();
+                    if(!nbrs.containsKey(v)) {
+                        nodes.add(v);
+                    }
+                }
             }
         }
         return nodes;
