@@ -84,7 +84,10 @@ public class Graph extends AbstractGraph
             update(e.reverse());
     }
     synchronized public void breakEdge(int u, int v) {
-        adj.get(u).remove(v);
+        try {
+            adj.get(u).remove(v);
+        }
+        catch(NullPointerException e) {}
     }
 
     public Graph(BufferedReader br, boolean symmetric) throws IOException
