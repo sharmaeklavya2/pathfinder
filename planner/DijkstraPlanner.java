@@ -14,7 +14,6 @@ import graph.Graph;
 import graph.GridGraph;
 import graph.Edge;
 import planner.AbstractAdjacentPlanner;
-import planner.Stage;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

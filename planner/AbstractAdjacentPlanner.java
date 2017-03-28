@@ -6,7 +6,6 @@ import static java.lang.Math.abs;
 import graph.Edge;
 import gridpanel.GridPanelCell;
 import planner.AbstractPlanner;
-import planner.Stage;
 
 public abstract class AbstractAdjacentPlanner extends AbstractPlanner
 // An abstract planner where a robot only moves to adjacent nodes
