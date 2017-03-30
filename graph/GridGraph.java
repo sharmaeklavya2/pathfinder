@@ -206,6 +206,6 @@ public class GridGraph extends AbstractGraph
     public static void main(String[] args) throws IOException, GridGraphCreateException {
         String usage = "usage: java graphs.GridGraph [file]";
         GridGraph graph = new GridGraph(CmdUtil.getBrFromArgs(args, usage, true));
-        System.out.println(graph.toGraph().toString());
+        System.out.println(graph.toGenGraph().toString());
     }
 }

@@ -12,7 +12,7 @@ import graph.Edge;
 import graph.AbstractGraph;
 import util.CmdUtil;
 
-public class Graph extends AbstractGraph
+public class GenGraph extends AbstractGraph
 {
     private List<HashMap<Integer, Double>> preds;
     private List<HashMap<Integer, Double>> succs;
@@ -58,13 +58,13 @@ public class Graph extends AbstractGraph
         }
     }
 
-    public Graph(int n, Edge[] edges, boolean symmetric) {
+    public GenGraph(int n, Edge[] edges, boolean symmetric) {
         this(n);
 
         for(Edge e: edges)
             update(e, symmetric);
     }
-    public Graph(int n) {
+    public GenGraph(int n) {
         _size = n;
         preds = new ArrayList<HashMap<Integer, Double>>(n);
         succs = new ArrayList<HashMap<Integer, Double>>(n);
@@ -73,7 +73,7 @@ public class Graph extends AbstractGraph
             succs.add(new HashMap<Integer, Double>());
         }
     }
-    public Graph(AbstractGraph graph2) {
+    public GenGraph(AbstractGraph graph2) {
         this(graph2.size());
         for(int u=0; u<_size; ++u) {
             for(Map.Entry<Integer, Double> entry: graph2.getSuccs(u).entrySet()) {
@@ -86,7 +86,7 @@ public class Graph extends AbstractGraph
     }
 
     synchronized public String toString() {
-        return "Graph(" + _size + ", " + succs + ")";
+        return "GenGraph(" + _size + ", " + succs + ")";
     }
 
     synchronized public void update(int u, int v, double w) {
@@ -112,7 +112,7 @@ public class Graph extends AbstractGraph
         catch(NullPointerException e) {}
     }
 
-    public Graph(BufferedReader br, boolean symmetric) throws IOException
+    public GenGraph(BufferedReader br, boolean symmetric) throws IOException
     {
         int n = Integer.parseInt(br.readLine());
         _size = n;
@@ -135,15 +135,15 @@ public class Graph extends AbstractGraph
             }
         }
     }
-    public Graph(BufferedReader br) throws IOException {
+    public GenGraph(BufferedReader br) throws IOException {
         this(br, true);
     }
 
     public static void main(String[] args) throws IOException
     {
-        String usage = "usage: java graphs.Graph [file]";
+        String usage = "usage: java graphs.GenGraph [file]";
         boolean symmetric = true;
-        Graph graph = new Graph(CmdUtil.getBrFromArgs(args, usage, true));
+        GenGraph graph = new GenGraph(CmdUtil.getBrFromArgs(args, usage, true));
         System.out.println(graph.toString());
     }
 }

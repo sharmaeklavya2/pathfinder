@@ -10,7 +10,7 @@ import java.awt.Color;
 
 import gridpanel.GridPanelCell;
 import graph.AbstractGraph;
-import graph.Graph;
+import graph.GenGraph;
 import graph.GridGraph;
 import graph.Edge;
 import planner.AbstractAdjacentPlanner;
@@ -104,7 +104,7 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
         if(curr < 0 || curr >= graphRemote.size())
             throw new IllegalArgumentException("Parameter curr has invalid value " + curr);
         this.distance = 0;
-        this.graphLocal = graphRemote.toGraph();
+        this.graphLocal = graphRemote.toGenGraph();
         this.curr = curr;
         replan();
     }

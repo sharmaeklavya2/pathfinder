@@ -28,8 +28,8 @@ public class AdjDriver
         int goal_v = Integer.parseInt(inbr.readLine());
 
         AbstractGraph graph;
-        if(gtype.equals("Graph"))
-            graph = new Graph(fbr);
+        if(gtype.equals("GenGraph"))
+            graph = new GenGraph(fbr);
         else if(gtype.equals("GridGraph"))
             graph = new GridGraph(fbr);
         else
@@ -62,11 +62,11 @@ public class AdjDriver
                 else if(words[0].equals("local")) {
                     System.out.println("Local graph: " + planner.getLocalGraphStr());
                 }
-                else if(words[0].equals("update") && (graph instanceof Graph)) {
+                else if(words[0].equals("update") && (graph instanceof GenGraph)) {
                     int u = Integer.parseInt(words[1]);
                     int v = Integer.parseInt(words[2]);
                     double w = Double.parseDouble(words[3]);
-                    ((Graph)graph).update(new Edge(u, v, w), true);
+                    ((GenGraph)graph).update(new Edge(u, v, w), true);
                 }
                 else if(words[0].equals("update") && (graph instanceof GridGraph)) {
                     int i = Integer.parseInt(words[1]);
@@ -74,10 +74,10 @@ public class AdjDriver
                     int t = Integer.parseInt(words[3]);
                     ((GridGraph)graph).update(i, j, new GridGraphNode(t, 1));
                 }
-                else if(words[0].equals("break") && (graph instanceof Graph)) {
+                else if(words[0].equals("break") && (graph instanceof GenGraph)) {
                     int u = Integer.parseInt(words[1]);
                     int v = Integer.parseInt(words[2]);
-                    ((Graph)graph).breakEdge(u, v);
+                    ((GenGraph)graph).breakEdge(u, v);
                 }
                 else {
                     System.out.println("Invalid command");

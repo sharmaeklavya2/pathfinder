@@ -1,14 +1,14 @@
 package planner;
 
 import graph.AbstractGraph;
-import graph.Graph;
+import graph.GenGraph;
 import planner.NodeUpdateCallback;
 
 abstract class AbstractPlanner
 {
     protected int goal, curr;
     protected AbstractGraph graphRemote;
-    protected Graph graphLocal;
+    protected GenGraph graphLocal;
     protected int distance;
     protected NodeUpdateCallback callback;
     // graphRemote can be (in fact, we sometimes want it to be) modified from outside.

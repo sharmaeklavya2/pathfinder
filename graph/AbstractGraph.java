@@ -3,7 +3,7 @@ package graph;
 import java.util.Map;
 import java.util.Set;
 
-import graph.Graph;
+import graph.GenGraph;
 
 public abstract class AbstractGraph
 {
@@ -17,7 +17,7 @@ public abstract class AbstractGraph
     public abstract double getWeight(int src, int dst);
     public abstract String toString();
 
-    synchronized public Graph toGraph() {
-        return new Graph(this);
+    synchronized public GenGraph toGenGraph() {
+        return new GenGraph(this);
     }
 }
