@@ -7,8 +7,8 @@ import graph.Edge;
 import gridpanel.GridPanelCell;
 import planner.AbstractPlanner;
 
-public abstract class AbstractAdjacentPlanner extends AbstractPlanner
-// An abstract planner where a robot only moves to adjacent nodes
+public abstract class AbstractANSPlanner extends AbstractPlanner
+// An abstract planner where planned path is an Adjacent Node Sequence (ANS),
 {
     public abstract int getNext(int u);
 

@@ -8,11 +8,11 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-public class AdjDriver
+public class ANSDriver
 {
     public static void main(String[] args) throws IOException, GridGraph.CreateException
     {
-        String usage = "usage: java driver.AdjacentDriver [file]";
+        String usage = "usage: java driver.ANSDriver [file]";
         BufferedReader inbr = new BufferedReader(new InputStreamReader(System.in));
         BufferedReader fbr = CmdUtil.getBrFromArgs(args, usage, true);
 
@@ -39,7 +39,7 @@ public class AdjDriver
         if(goal_v == -1)
             goal_v = graph.size() - 1;
 
-        AbstractAdjacentPlanner planner;
+        AbstractANSPlanner planner;
         if(ptype.equals("0"))
             planner = new DijkstraPlanner(start_v, goal_v, graph);
         else

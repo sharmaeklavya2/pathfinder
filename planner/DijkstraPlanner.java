@@ -13,7 +13,7 @@ import graph.AbstractGraph;
 import graph.GenGraph;
 import graph.GridGraph;
 import graph.Edge;
-import planner.AbstractAdjacentPlanner;
+import planner.AbstractANSPlanner;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -43,7 +43,7 @@ class PQElem implements Comparable<PQElem>
     }
 }
 
-abstract class DijkstraPlannerHelper extends AbstractAdjacentPlanner
+abstract class DijkstraPlannerHelper extends AbstractANSPlanner
 {
     public static enum Stage
     {NEW, OPEN, CLOSED}

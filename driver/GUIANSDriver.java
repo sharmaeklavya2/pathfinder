@@ -22,14 +22,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.PrintWriter;
 
-public abstract class GUIAdjDriver
+public abstract class GUIANSDriver
 {
     public static class MyGridPanel extends GridPanel
     {
-        AbstractAdjacentPlanner planner;
+        AbstractANSPlanner planner;
         GridGraph graph;
 
-        public MyGridPanel(AbstractAdjacentPlanner planner, GridGraph graph) {
+        public MyGridPanel(AbstractANSPlanner planner, GridGraph graph) {
             super(graph.getRows(), graph.getCols());
             this.planner = planner;
             this.graph = graph;
@@ -57,7 +57,7 @@ public abstract class GUIAdjDriver
         GUIUtil.setlf();
         GridGraph graph;
         GridPanel gridPanel;
-        AbstractAdjacentPlanner planner;
+        AbstractANSPlanner planner;
 
         // get graph
         BufferedReader br = new BufferedReader(new FileReader(fpath));
@@ -239,7 +239,7 @@ public abstract class GUIAdjDriver
     }
 
     public static void main(String[] args) throws IOException, GridGraph.CreateException {
-        String usage = "usage: java driver.GUIAdjDriver <fpath> <plannerType> <callbackSleep> <sensorRadius>";
+        String usage = "usage: java driver.GUIAnsDriver <fpath> <plannerType> <callbackSleep> <sensorRadius>";
         if(args.length == 4) {
             String fpath = args[0];
             String plannerType = args[1];

@@ -38,13 +38,13 @@ If you don't want to install `ant`, you can view `build.xml` and write appropria
 
 To run a text-based application, you can run:
 
-    java driver.AdjDriver sample_input/Graph.txt
+    java driver.ANSDriver sample_input/Graph.txt
 
-Read `driver/AdjDriver.java` to see which commands are supported.
+Read `driver/ANSDriver.java` to see which commands are supported.
 
 To run a GUI application, you can run:
 
-    java driver.GUIAdjDriver sample_input/GridGraph3.txt DijkstraPlanner 2 2
+    java driver.GUIANSDriver sample_input/GridGraph3.txt DijkstraPlanner 2 2
 
 It should be intuitive how to use this application, but if you have any problems,
-please refer to `driver/GUIAdjDriver.java` and inform me about it.
+please refer to `driver/GUIANSDriver.java` and inform me about it.
