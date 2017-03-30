@@ -80,9 +80,8 @@ public abstract class AbstractAdjacentPlanner extends AbstractPlanner
             if(!nodes.contains(u)) {
                 int du = distMap.get(u);
                 nodes.add(u);
-                Map<Integer, Double> nbrs = graphRemote.getNbrs(u);
-                for(Map.Entry<Integer, Double> entry: nbrs.entrySet()) {
-                    int v = entry.getKey();
+                Set<Integer> nbrs = graphRemote.getNbrs(u);
+                for(int v: nbrs) {
                     int dv = du + 1;
                     if(distMap.containsKey(v)) {
                         int dv2 = distMap.get(v);
@@ -103,10 +102,9 @@ public abstract class AbstractAdjacentPlanner extends AbstractPlanner
                 // Also add nodes which would have been included if they weren't blocked
                 // but their neighbors shouldn't be blocked.
                 // This enables us to block paths from blocked nodes
-                Map<Integer, Double> lnbrs = graphLocal.getNbrs(u);
-                for(Map.Entry<Integer, Double> entry: lnbrs.entrySet()) {
-                    int v = entry.getKey();
-                    if(!nbrs.containsKey(v)) {
+                Set<Integer> lnbrs = graphLocal.getNbrs(u);
+                for(int v: lnbrs) {
+                    if(!nbrs.contains(v)) {
                         nodes.add(v);
                     }
                 }
@@ -144,13 +142,13 @@ public abstract class AbstractAdjacentPlanner extends AbstractPlanner
             TreeSet<Edge2> ledgeSet = new TreeSet<Edge2>();
             TreeSet<Edge2> redgeSet = new TreeSet<Edge2>();
             for(int u: nearbyNodes) {
-                Set<Integer> lnbrs = graphLocal.getNbrs(u).keySet();
-                for(int v: lnbrs) {
+                Set<Integer> lsuccs = graphLocal.getSuccs(u).keySet();
+                for(int v: lsuccs) {
                     ledgeSet.add(new Edge2(u, v));
                     ledgeSet.add(new Edge2(v, u));
                 }
-                Set<Integer> rnbrs = graphRemote.getNbrs(u).keySet();
-                for(int v: rnbrs) {
+                Set<Integer> rsuccs = graphRemote.getSuccs(u).keySet();
+                for(int v: rsuccs) {
                     redgeSet.add(new Edge2(u, v));
                     redgeSet.add(new Edge2(v, u));
                 }

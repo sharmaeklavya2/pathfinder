@@ -205,7 +205,7 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
             if(u == curr)
                 break;
 
-            for(Map.Entry<Integer, Double> entry: graphLocal.getNbrs(u).entrySet()) {
+            for(Map.Entry<Integer, Double> entry: graphLocal.getPreds(u).entrySet()) {
                 int v = entry.getKey();
                 double w = entry.getValue();
                 if(getStage(v) == Stage.NEW) {

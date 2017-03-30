@@ -1,9 +1,6 @@
 package graph;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 import static java.util.Collections.unmodifiableMap;
 
 import java.io.BufferedReader;
@@ -17,20 +14,33 @@ import util.CmdUtil;
 
 public class Graph extends AbstractGraph
 {
-    private List<HashMap<Integer, Double>> adj;
+    private List<HashMap<Integer, Double>> preds;
+    private List<HashMap<Integer, Double>> succs;
     private int _size;
 
     public int size() {
         return _size;
     }
-    synchronized public Map<Integer, Double> getNbrs(int node) {
-        return unmodifiableMap(adj.get(node));
+    synchronized public Map<Integer, Double> getPreds(int node) {
+        return unmodifiableMap(preds.get(node));
     }
-    synchronized public Map<Integer, Double> getNbrsCopy(int node) {
-        return new HashMap<Integer, Double>(adj.get(node));
+    synchronized public Map<Integer, Double> getSuccs(int node) {
+        return unmodifiableMap(succs.get(node));
     }
-    synchronized public boolean adjacent(int src, int dst) {
-        return (src < _size && src >= 0 && adj.get(src).containsKey(dst));
+    synchronized public Map<Integer, Double> getPredsCopy(int node) {
+        return new HashMap<Integer, Double>(preds.get(node));
+    }
+    synchronized public Map<Integer, Double> getSuccsCopy(int node) {
+        return new HashMap<Integer, Double>(succs.get(node));
+    }
+    synchronized public Set<Integer> getNbrs(int node) {
+        Set<Integer> nbrs = new HashSet<Integer>(succs.get(node).keySet());
+        nbrs.addAll(preds.get(node).keySet());
+        return nbrs;
+    }
+
+    synchronized public boolean hasEdge(int src, int dst) {
+        return (src < _size && src >= 0 && succs.get(src).containsKey(dst));
     }
 
     public static class NonAdjacentException extends RuntimeException {
@@ -41,7 +51,7 @@ public class Graph extends AbstractGraph
 
     synchronized public double getWeight(int src, int dst) {
         try {
-            return adj.get(src).get(dst);
+            return succs.get(src).get(dst);
         }
         catch(NullPointerException e) {
             throw new NonAdjacentException("getWeight(" + src + ", " + dst + ") failed");
@@ -56,36 +66,48 @@ public class Graph extends AbstractGraph
     }
     public Graph(int n) {
         _size = n;
-        adj = new ArrayList<HashMap<Integer, Double>>(n);
-        for(int i=0; i<n; ++i)
-            adj.add(new HashMap<Integer, Double>());
+        preds = new ArrayList<HashMap<Integer, Double>>(n);
+        succs = new ArrayList<HashMap<Integer, Double>>(n);
+        for(int i=0; i<n; ++i) {
+            preds.add(new HashMap<Integer, Double>());
+            succs.add(new HashMap<Integer, Double>());
+        }
     }
     public Graph(AbstractGraph graph2) {
         this(graph2.size());
         for(int u=0; u<_size; ++u) {
-            for(Map.Entry<Integer, Double> entry: graph2.getNbrs(u).entrySet()) {
+            for(Map.Entry<Integer, Double> entry: graph2.getSuccs(u).entrySet()) {
                 int v = entry.getKey();
                 double w = entry.getValue();
-                adj.get(u).put(v, w);
+                succs.get(u).put(v, w);
+                preds.get(v).put(u, w);
             }
         }
     }
 
     synchronized public String toString() {
-        return "Graph(" + _size + ", " + adj + ")";
+        return "Graph(" + _size + ", " + succs + ")";
     }
 
+    synchronized public void update(int u, int v, double w) {
+        succs.get(u).put(v, w);
+        preds.get(v).put(u, w);
+    }
+    synchronized public void update(int u, int v, double w, boolean symmetric) {
+        update(u, v, w);
+        if(symmetric)
+            update(v, u, w);
+    }
     synchronized public void update(Edge e) {
-        adj.get(e.getSrc()).put(e.getDst(), e.getW());
+        update(e.getSrc(), e.getDst(), e.getW());
     }
     synchronized public void update(Edge e, boolean symmetric) {
-        update(e);
-        if(symmetric)
-            update(e.reverse());
+        update(e.getSrc(), e.getDst(), e.getW(), symmetric);
     }
     synchronized public void breakEdge(int u, int v) {
         try {
-            adj.get(u).remove(v);
+            succs.get(u).remove(v);
+            preds.get(v).remove(u);
         }
         catch(NullPointerException e) {}
     }
@@ -94,9 +116,12 @@ public class Graph extends AbstractGraph
     {
         int n = Integer.parseInt(br.readLine());
         _size = n;
-        adj = new ArrayList<HashMap<Integer, Double>>(n);
-        for(int i=0; i<n; ++i)
-            adj.add(new HashMap<Integer, Double>());
+        preds = new ArrayList<HashMap<Integer, Double>>(n);
+        succs = new ArrayList<HashMap<Integer, Double>>(n);
+        for(int i=0; i<n; ++i) {
+            preds.add(new HashMap<Integer, Double>());
+            succs.add(new HashMap<Integer, Double>());
+        }
 
         String s;
         String[] words;
@@ -106,7 +131,7 @@ public class Graph extends AbstractGraph
                 int src = Integer.parseInt(words[0]);
                 int dst = Integer.parseInt(words[1]);
                 double w = Double.parseDouble(words[2]);
-                update(new Edge(src, dst, w), symmetric);
+                update(src, dst, w, symmetric);
             }
         }
     }

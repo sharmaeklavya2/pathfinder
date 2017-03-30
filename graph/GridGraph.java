@@ -1,9 +1,6 @@
 package graph;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 import java.lang.Math;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
@@ -53,9 +50,9 @@ public class GridGraph extends AbstractGraph
         return v % cols - u % cols;
     }
 
-    public boolean adjacent(int src, int dst) {
+    public boolean hasEdge(int src, int dst) {
         long nrm = norm(src, dst);
-        return nrm >= 0 && nrm <= 2;
+        return nrm > 0 && nrm <= 2;
     }
 
     synchronized public double getWeight(int src, int dst) {
@@ -70,7 +67,7 @@ public class GridGraph extends AbstractGraph
         return "GridGraph(" + rows + ", " + cols + ")";
     }
 
-    synchronized public Map<Integer, Double> getNbrsCopy(int u) {
+    synchronized public Map<Integer, Double> getPredsCopy(int u) {
         Map<Integer, Double> hm = new HashMap<Integer, Double>(8);
         int ui = u / cols, uj = u % cols;
         int[] drows = {-1, 0, 1};
@@ -93,9 +90,10 @@ public class GridGraph extends AbstractGraph
         }
         return hm;
     }
-    public Map<Integer, Double> getNbrs(int u) {
-        return getNbrsCopy(u);
-    }
+    public Map<Integer, Double> getPreds(int u) {return getPredsCopy(u);}
+    public Map<Integer, Double> getSuccsCopy(int u) {return getPredsCopy(u);}
+    public Map<Integer, Double> getSuccs(int u) {return getPredsCopy(u);}
+    public Set<Integer> getNbrs(int u) {return getPredsCopy(u).keySet();}
 
     public GridGraph(int rows, int cols, int[] types) {
         this.rows = rows;
