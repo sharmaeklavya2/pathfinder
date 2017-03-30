@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 
 public class AdjDriver
 {
-    public static void main(String[] args) throws IOException, GridGraphCreateException
+    public static void main(String[] args) throws IOException, GridGraph.CreateException
     {
         String usage = "usage: java driver.AdjacentDriver [file]";
         BufferedReader inbr = new BufferedReader(new InputStreamReader(System.in));
@@ -72,7 +72,7 @@ public class AdjDriver
                     int i = Integer.parseInt(words[1]);
                     int j = Integer.parseInt(words[2]);
                     int t = Integer.parseInt(words[3]);
-                    ((GridGraph)graph).update(i, j, new GridGraphNode(t, 1));
+                    ((GridGraph)graph).update(i, j, new GridGraph.Node(t, 1));
                 }
                 else if(words[0].equals("break") && (graph instanceof GenGraph)) {
                     int u = Integer.parseInt(words[1]);

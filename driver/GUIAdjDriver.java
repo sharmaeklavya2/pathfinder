@@ -44,15 +44,15 @@ public abstract class GUIAdjDriver
 
         @Override
         public void handleClick(int row, int col) {
-            GridGraphNode node = graph.getNode(row, col);
+            GridGraph.Node node = graph.getNode(row, col);
             int type = node.getType();
             int type2 = type == 0 ? 1 : 0;
-            graph.update(row, col, new GridGraphNode(type2, node.getOcc()));
+            graph.update(row, col, new GridGraph.Node(type2, node.getOcc()));
         }
     }
 
     public static void run(String fpath, String plannerType, final int callbackSleep,
-        int sensorRadius) throws IOException, GridGraphCreateException
+        int sensorRadius) throws IOException, GridGraph.CreateException
     {
         GUIUtil.setlf();
         GridGraph graph;
@@ -80,9 +80,9 @@ public abstract class GUIAdjDriver
             }
         }
         if(start == -1)
-            throw new GridGraphCreateException("Start node not specified");
+            throw new GridGraph.CreateException("Start node not specified");
         if(goal == -1)
-            throw new GridGraphCreateException("Goal node not specified");
+            throw new GridGraph.CreateException("Goal node not specified");
 
         // get planner
         if(plannerType.equals("DijkstraPlanner")) {
@@ -96,7 +96,7 @@ public abstract class GUIAdjDriver
         gridPanel = new MyGridPanel(planner, graph);
 
         // add callbacks
-        GridGraphUpdateCallback gguc = new GridGraphUpdateCallback() {
+        GridGraph.UpdateCallback gguc = new GridGraph.UpdateCallback() {
             @Override
             public void run(int i, int j) {
                 try {
@@ -238,7 +238,7 @@ public abstract class GUIAdjDriver
         GUIUtil.makeGUI(plannerType, gridPanel, buttonPanel, null);
     }
 
-    public static void main(String[] args) throws IOException, GridGraphCreateException {
+    public static void main(String[] args) throws IOException, GridGraph.CreateException {
         String usage = "usage: java driver.GUIAdjDriver <fpath> <plannerType> <callbackSleep> <sensorRadius>";
         if(args.length == 4) {
             String fpath = args[0];

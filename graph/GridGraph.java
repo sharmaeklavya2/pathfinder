@@ -6,7 +6,6 @@ import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
 import graph.AbstractGraph;
-import graph.GridGraphNode;
 import util.CmdUtil;
 
 import java.io.FileReader;
@@ -15,21 +14,51 @@ import java.io.IOException;
 
 public class GridGraph extends AbstractGraph
 {
+    public static class Node
+    {
+        private int type;
+        private int occ;    // occupancy
+
+        public int getType() {return type;}
+        public int getOcc() {return occ;}
+
+        public Node(int type, int occ) {
+            this.type = type;
+            this.occ = occ;
+        }
+        public Node() {
+            this(0, 1);
+        }
+
+        public String toString() {
+            return "GridGraph.Node(" + type + ", " + occ + ")";
+        }
+    }
+
+    public static class CreateException extends Exception
+    {
+        public CreateException(String s) {super(s);}
+    }
+
+    public static abstract class UpdateCallback {
+        public abstract void run(int i, int j);
+    }
+
     private int rows, cols;
     private int _size;
-    private GridGraphNode[] grid;
-    private GridGraphUpdateCallback updateCallback;
+    private Node[] grid;
+    private UpdateCallback updateCallback;
 
     public int getRows() {return rows;}
     public int getCols() {return cols;}
     public int size() {return _size;}
-    public GridGraphNode getNode(int i, int j) {return grid[i * cols + j];}
-    public GridGraphNode getNode(int u) {return grid[u];}
+    public Node getNode(int i, int j) {return grid[i * cols + j];}
+    public Node getNode(int u) {return grid[u];}
 
-    public GridGraphUpdateCallback getCallback() {
+    public UpdateCallback getCallback() {
         return updateCallback;
     }
-    public void setCallback(GridGraphUpdateCallback callback) {
+    public void setCallback(UpdateCallback callback) {
         this.updateCallback = callback;
     }
 
@@ -102,7 +131,7 @@ public class GridGraph extends AbstractGraph
         if(types.length != size())
             throw new IllegalArgumentException("length of types is not equal to grid size");
         for(int i=0; i < types.length; ++i) {
-            grid[i] = new GridGraphNode(types[i], 1);
+            grid[i] = new Node(types[i], 1);
         }
     }
     public GridGraph(int rows, int cols) {
@@ -110,11 +139,11 @@ public class GridGraph extends AbstractGraph
         this.cols = cols;
         this._size = rows * cols;
         for(int i=0; i < _size; ++i) {
-            grid[i] = new GridGraphNode(0, 1);
+            grid[i] = new Node(0, 1);
         }
     }
 
-    synchronized public void update(int i, int j, GridGraphNode node) {
+    synchronized public void update(int i, int j, Node node) {
         grid[i * cols + j] = node;
         if(updateCallback != null)
             updateCallback.run(i, j);
@@ -122,9 +151,9 @@ public class GridGraph extends AbstractGraph
 
     public static String zeros = "0-SsGg";
 
-    public static GridGraphNode nodeFromChar(char ch) throws GridGraphCreateException {
+    public static Node nodeFromChar(char ch) throws CreateException {
         if(ch == ' ')
-            throw new GridGraphCreateException("Encountered space while reading GridGraph");
+            throw new CreateException("Encountered space while reading GridGraph");
         int type = 1;
         for(int i=0; i < zeros.length(); ++i) {
             if(ch == zeros.charAt(i)) {
@@ -132,20 +161,20 @@ public class GridGraph extends AbstractGraph
                 break;
             }
         }
-        return new GridGraphNode(type, 1);
+        return new Node(type, 1);
     }
 
-    public GridGraph(BufferedReader br) throws IOException, GridGraphCreateException {
+    public GridGraph(BufferedReader br) throws IOException, CreateException {
         String s;
         cols = -1;
-        ArrayList<GridGraphNode> gridArray = new ArrayList<GridGraphNode>();
+        ArrayList<Node> gridArray = new ArrayList<Node>();
         for(rows = 0; (s = br.readLine()) != null; rows++) {
             s = s.trim();
             if(cols != s.length()) {
                 if(cols == -1)
                     cols = s.length();
                 else
-                    throw new GridGraphCreateException("Rows are of different lengths");
+                    throw new CreateException("Rows are of different lengths");
             }
             gridArray.ensureCapacity(cols * (rows + 1));
             for(int j=0; j < cols; ++j) {
@@ -153,7 +182,7 @@ public class GridGraph extends AbstractGraph
                 gridArray.add(nodeFromChar(ch));
             }
         }
-        grid = new GridGraphNode[gridArray.size()];
+        grid = new Node[gridArray.size()];
         _size = rows * cols;
         for(int i=0; i<_size; ++i)
             grid[i] = gridArray.get(i);
@@ -168,14 +197,14 @@ public class GridGraph extends AbstractGraph
         */
     }
 
-    public GridGraph(List<String> lines) throws GridGraphCreateException {
+    public GridGraph(List<String> lines) throws CreateException {
         rows = lines.size();
         cols = lines.get(0).length();
         for(String line: lines)
             if(line.length() != cols)
-                    throw new GridGraphCreateException("Rows are of different lengths");
+                    throw new CreateException("Rows are of different lengths");
         _size = rows * cols;
-        grid = new GridGraphNode[_size];
+        grid = new Node[_size];
 
         for(int i=0; i < rows; ++i) {
             for(int j=0; j < cols; ++j) {
@@ -203,7 +232,7 @@ public class GridGraph extends AbstractGraph
         return new String(a);
     }
 
-    public static void main(String[] args) throws IOException, GridGraphCreateException {
+    public static void main(String[] args) throws IOException, CreateException {
         String usage = "usage: java graphs.GridGraph [file]";
         GridGraph graph = new GridGraph(CmdUtil.getBrFromArgs(args, usage, true));
         System.out.println(graph.toGenGraph().toString());
