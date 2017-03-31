@@ -9,7 +9,7 @@
     </target>
 
     <target name="build">
-        <javac destdir="." debug="true">
+        <javac includeantruntime="false" destdir="." debug="true">
             <src path="gridpanel" />
             <src path="graph" />
             <src path="planner" />
