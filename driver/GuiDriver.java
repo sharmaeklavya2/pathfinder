@@ -53,8 +53,8 @@ public abstract class GuiDriver
         }
     }
 
-    private static AbstractPlanner getPlanner(String name, int start, int goal, AbstractGraph graph) {
-        Robot robot = new GraphRobot(graph, start);
+    private static AbstractPlanner getPlanner(String name, int start, int goal, GridGraph graph) {
+        Robot robot = new GridRobot(graph, start);
         if(name.equals("DijkstraPlanner")) {
             return new DijkstraPlanner(goal, robot);
         }
