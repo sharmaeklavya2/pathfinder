@@ -9,12 +9,14 @@ import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.BoxLayout;
+import javax.swing.SwingUtilities;
 
 import util.GUIUtil;
 import graph.*;
 import planner.*;
 import gridpanel.GridPanel;
 import gridpanel.GridPanelCell;
+import robot.*;
 
 import java.lang.Thread;
 import java.io.IOException;
@@ -22,14 +24,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.PrintWriter;
 
-public abstract class GUIANSDriver
+public abstract class GuiDriver
 {
     public static class MyGridPanel extends GridPanel
     {
-        AbstractANSPlanner planner;
+        AbstractPlanner planner;
         GridGraph graph;
 
-        public MyGridPanel(AbstractANSPlanner planner, GridGraph graph) {
+        public MyGridPanel(AbstractPlanner planner, GridGraph graph) {
             super(graph.getRows(), graph.getCols());
             this.planner = planner;
             this.graph = graph;
@@ -51,13 +53,25 @@ public abstract class GUIANSDriver
         }
     }
 
+    private static AbstractPlanner getPlanner(String name, int start, int goal, AbstractGraph graph) {
+        Robot robot = new GraphRobot(graph, start);
+        if(name.equals("DijkstraPlanner")) {
+            return new DijkstraPlanner(goal, robot);
+        }
+        else {
+            throw new RuntimeException("Invalid Planner type");
+        }
+    }
+
+    private static GridGraph graph;
+    private static GridPanel gridPanel;
+    private static AbstractPlanner planner;
+    private static int start=-1, goal=-1;
+
     public static void run(String fpath, String plannerType, final int callbackSleep,
         int sensorRadius) throws IOException, GridGraph.CreateException
     {
         GUIUtil.setlf();
-        GridGraph graph;
-        GridPanel gridPanel;
-        AbstractANSPlanner planner;
 
         // get graph
         BufferedReader br = new BufferedReader(new FileReader(fpath));
@@ -68,7 +82,6 @@ public abstract class GUIANSDriver
         //System.err.println(lines);
         graph = new GridGraph(lines);
         int grows = graph.getRows(), gcols = graph.getCols();
-        int start=-1, goal=-1;
         for(int i=0; i < grows; ++i) {
             for(int j=0; j < gcols; ++j) {
                 char ch = lines.get(i).charAt(j);
@@ -85,12 +98,7 @@ public abstract class GUIANSDriver
             throw new GridGraph.CreateException("Goal node not specified");
 
         // get planner
-        if(plannerType.equals("DijkstraPlanner")) {
-            planner = new DijkstraPlanner(start, goal, graph);
-        }
-        else {
-            throw new RuntimeException("Invalid Planner type");
-        }
+        planner = getPlanner(plannerType, start, goal, graph);
 
         // get GridPanel
         gridPanel = new MyGridPanel(planner, graph);
@@ -111,9 +119,9 @@ public abstract class GUIANSDriver
         };
         graph.setCallback(gguc);
 
-        NodeUpdateCallback nuc = new NodeUpdateCallback() {
+        AbstractPlanner.Callback nuc = new AbstractPlanner.Callback() {
             @Override
-            public void run(int u) {
+            public void nodeUpdate(int u) {
                 try {
                     if(callbackSleep > 0)
                         Thread.sleep(callbackSleep);
@@ -123,12 +131,17 @@ public abstract class GUIANSDriver
                 gridPanel.setCell(u, planner.getGridPanelCell(u));
             }
             @Override
-            public void pathDone() {
-                (new Thread("pathDone_thread") {
+            public void move(int u, int v) {
+                nodeUpdate(u);
+                nodeUpdate(v);
+            }
+            @Override
+            public void pathUpdate() {
+                (new Thread("pathUpdate_thread") {
                     @Override
                     public void run() {
-                        System.err.println("pathDone()");
-                        int curr = planner.getCurr();
+                        System.err.println("pathUpdate()");
+                        int curr = planner.getRobot().getPosition();
                         if(curr != -1) {
                             curr = planner.getNext(curr);
                         }
@@ -144,7 +157,7 @@ public abstract class GUIANSDriver
             }
         };
         planner.setCallback(nuc);
-        nuc.pathDone();
+        nuc.pathUpdate();
 
         // draw buttons panel
         JButton moveButton = new JButton("Move");
@@ -158,10 +171,15 @@ public abstract class GUIANSDriver
                 (new Thread("move_thread") {
                     @Override
                     public void run() {
-                        if(planner.getCurr() != planner.getGoal())
+                        if(planner.getRobot().getPosition() != planner.getGoal())
                             planner.move(sensorRadius);
-                        if(planner.getCurr() == planner.getGoal())
-                            moveButton.setEnabled(false);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(planner.getRobot().getPosition() == planner.getGoal())
+                                    moveButton.setEnabled(false);
+                            }
+                        });
                     }
                 }).start();
             }
@@ -196,8 +214,16 @@ public abstract class GUIANSDriver
                 (new Thread("reset_thread") {
                     @Override
                     public void run() {
-                        planner.reset(start);
-                        moveButton.setEnabled(true);
+                        int goal = planner.getGoal();
+                        planner = getPlanner(plannerType, start, goal, graph);
+                        planner.setCallback(nuc);
+                        planner.reset();
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                moveButton.setEnabled(true);
+                            }
+                        });
                     }
                 }).start();
             }
@@ -239,7 +265,7 @@ public abstract class GUIANSDriver
     }
 
     public static void main(String[] args) throws IOException, GridGraph.CreateException {
-        String usage = "usage: java driver.GUIAnsDriver <fpath> <plannerType> <callbackSleep> <sensorRadius>";
+        String usage = "usage: java driver.GuiDriver <fpath> <plannerType> <callbackSleep> <sensorRadius>";
         if(args.length == 4) {
             String fpath = args[0];
             String plannerType = args[1];

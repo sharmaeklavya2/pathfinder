@@ -1,19 +1,16 @@
 package planner;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.lang.IllegalArgumentException;
-import java.util.PriorityQueue;
-import static java.lang.Math.abs;
+import java.util.*;
 import java.awt.Color;
+import static java.lang.Math.abs;
 
 import gridpanel.GridPanelCell;
 import graph.AbstractGraph;
 import graph.GenGraph;
 import graph.GridGraph;
 import graph.Edge;
-import planner.AbstractANSPlanner;
+import planner.AbstractPlanner;
+import robot.Robot;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -43,7 +40,7 @@ class PQElem implements Comparable<PQElem>
     }
 }
 
-abstract class DijkstraPlannerHelper extends AbstractANSPlanner
+abstract class DijkstraPlannerHelper extends AbstractPlanner
 {
     public static enum Stage
     {NEW, OPEN, CLOSED}
@@ -58,54 +55,61 @@ abstract class DijkstraPlannerHelper extends AbstractANSPlanner
 
     protected void setDist(int u, double dist) {
         this.dist[u] = dist;
-        doCallback(u);
+        callback.nodeUpdate(u);
     }
     protected void setNext(int u, int next) {
         this.next[u] = next;
-        doCallback(u);
+        callback.nodeUpdate(u);
     }
     protected void setStage(int u, Stage stage) {
         this.stage[u] = stage;
-        doCallback(u);
+        callback.nodeUpdate(u);
     }
     protected void setDistNextStage(int u, double dist, int next, Stage stage) {
         this.dist[u] = dist;
         this.next[u] = next;
         this.stage[u] = stage;
-        doCallback(u);
+        callback.nodeUpdate(u);
     }
 
-    protected DijkstraPlannerHelper(int curr, int goal, AbstractGraph graph, NodeUpdateCallback callback)
+    protected DijkstraPlannerHelper(int n)
     {
-        this.goal = goal;
-        this.graphRemote = graph;
-        stage = new Stage[graph.size()];
-        dist = new double[graph.size()];
-        next = new int[graph.size()];
-        this.callback = callback;
-        reset(curr);
+        super();
+        stage = new Stage[n];
+        dist = new double[n];
+        next = new int[n];
     }
 }
 
 public class DijkstraPlanner extends DijkstraPlannerHelper
 {
     private PriorityQueue<PQElem> pq;
+    private Robot robot;
+    private AbstractGraph graph;
 
-    public DijkstraPlanner(int curr, int goal, AbstractGraph graph, NodeUpdateCallback callback) {
-        super(curr, goal, graph, callback);
+    public DijkstraPlanner(int goal, Robot robot, AbstractPlanner.Callback callback) {
+        super(robot.getGraph().size());
+        this.goal = goal;
+        this.callback = callback;
+        resetRobot(robot);
     }
-    public DijkstraPlanner(int curr, int goal, AbstractGraph graph) {
-        super(curr, goal, graph, null);
+    public DijkstraPlanner(int goal, Robot robot) {
+        this(goal, robot, new AbstractPlanner.Callback());
     }
 
-    public void reset(int curr)
-    /* Reset Planner and set current position */
-    {
-        if(curr < 0 || curr >= graphRemote.size())
-            throw new IllegalArgumentException("Parameter curr has invalid value " + curr);
-        this.distance = 0;
-        this.graphLocal = graphRemote.toGenGraph();
-        this.curr = curr;
+    public Robot getRobot() {
+        return robot;
+    }
+    public void resetRobot(Robot robot) {
+    /* Reset Planner */
+        this.robot = robot;
+        this.graph = robot.getGraph();
+        replan();
+    }
+
+    protected void examineUpdates(Set<Integer> l) {}
+
+    public void reset() {
         replan();
     }
 
@@ -115,12 +119,12 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
         Stage stage = getStage(u);
         int arrowX = 0, arrowY = 0;
 
-        if(graphRemote instanceof GridGraph) {
-            GridGraph graph = (GridGraph)graphRemote;
-            type = graph.getNode(u).getType();
+        if(graph instanceof GridGraph) {
+            GridGraph gridGraph = (GridGraph)graph;
+            type = gridGraph.getNode(u).getType();
             if(v != -1) {
-                arrowX = graph.diffJ(u, v);
-                arrowY = graph.diffI(u, v);
+                arrowX = gridGraph.diffJ(u, v);
+                arrowY = gridGraph.diffI(u, v);
             }
             else {
                 arrowX = arrowY = 0;
@@ -144,6 +148,7 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
             }
         }
         else {
+            int curr = robot.getPosition();
             if(u == curr || u == goal) {
                 if(u == curr && u == goal) {
                     color = Color.GREEN.darker();
@@ -181,7 +186,7 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
     public long replan()
     {
         System.err.println("Replanning");
-        for(int i=0; i < graphLocal.size(); ++i) {
+        for(int i=0; i < graph.size(); ++i) {
             setDistNextStage(i, Double.POSITIVE_INFINITY, -1, Stage.NEW);
         }
         setDistNextStage(goal, 0, goal, Stage.OPEN);
@@ -202,10 +207,10 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
                 throw new RuntimeException("Mismatch between priority queue ("
                     + prio + ") and dist[" + u + "] (" + getDist(u) + ")");
             setStage(u, Stage.CLOSED);
-            if(u == curr)
+            if(u == robot.getPosition())
                 break;
 
-            for(Map.Entry<Integer, Double> entry: graphLocal.getPreds(u).entrySet()) {
+            for(Map.Entry<Integer, Double> entry: graph.getPreds(u).entrySet()) {
                 int v = entry.getKey();
                 double w = entry.getValue();
                 if(getStage(v) == Stage.NEW) {
@@ -222,11 +227,10 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
             }
         }
         /*
-        for(int i=0; i<graphLocal.size(); ++i)
+        for(int i=0; i<graph.size(); ++i)
             System.out.print(" " + getDist(i));
         */
-        if(getCallback() != null)
-            getCallback().pathDone();
+        callback.pathUpdate();
         return pops;
     }
 }

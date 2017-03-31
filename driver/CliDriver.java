@@ -3,16 +3,17 @@ package driver;
 import util.CmdUtil;
 import graph.*;
 import planner.*;
+import robot.*;
 
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-public class ANSDriver
+public class CliDriver
 {
     public static void main(String[] args) throws IOException, GridGraph.CreateException
     {
-        String usage = "usage: java driver.ANSDriver [file]";
+        String usage = "usage: java driver.CliDriver [file]";
         BufferedReader inbr = new BufferedReader(new InputStreamReader(System.in));
         BufferedReader fbr = CmdUtil.getBrFromArgs(args, usage, true);
 
@@ -39,16 +40,18 @@ public class ANSDriver
         if(goal_v == -1)
             goal_v = graph.size() - 1;
 
-        AbstractANSPlanner planner;
+        Robot robot = new GraphRobot(graph, start_v);
+
+        AbstractPlanner planner;
         if(ptype.equals("0"))
-            planner = new DijkstraPlanner(start_v, goal_v, graph);
+            planner = new DijkstraPlanner(goal_v, robot);
         else
             throw new RuntimeException("Invalid planner");
 
-        System.out.println("Path: " + planner.getPath(planner.getCurr()));
+        System.out.println("Path: " + planner.getPath(robot.getPosition()));
         long total_replan_time = 0;
 
-        while(planner.getCurr() != planner.getGoal()) {
+        while(robot.getPosition() != planner.getGoal()) {
             System.out.print("> ");
             System.out.flush();
             String[] words = inbr.readLine().split(" ");
@@ -56,17 +59,17 @@ public class ANSDriver
                 if(words[0].equals("move")) {
                     long time_taken = planner.move();
                     System.out.println("Replanning time: " + time_taken);
-                    System.out.println("Path: " + planner.getPath(planner.getCurr()));
+                    System.out.println("Path: " + planner.getPath(robot.getPosition()));
                     total_replan_time += time_taken;
                 }
                 else if(words[0].equals("local")) {
-                    System.out.println("Local graph: " + planner.getLocalGraphStr());
+                    System.out.println("Local graph: " + robot.getGraph());
                 }
                 else if(words[0].equals("update") && (graph instanceof GenGraph)) {
                     int u = Integer.parseInt(words[1]);
                     int v = Integer.parseInt(words[2]);
                     double w = Double.parseDouble(words[3]);
-                    ((GenGraph)graph).update(new Edge(u, v, w), true);
+                    ((GenGraph)graph).update(u, v, w, true);
                 }
                 else if(words[0].equals("update") && (graph instanceof GridGraph)) {
                     int i = Integer.parseInt(words[1]);
