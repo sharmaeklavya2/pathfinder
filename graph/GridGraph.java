@@ -29,6 +29,12 @@ public class GridGraph extends AbstractGraph
         public Node() {
             this(0, 1);
         }
+        public Node(Node n) {
+            this(n.getType(), n.getOcc());
+        }
+        public boolean isSame(Node n) {
+            return (type == n.getType()) && (occ == n.getOcc());
+        }
 
         public String toString() {
             return "GridGraph.Node(" + type + ", " + occ + ")";
@@ -128,6 +134,7 @@ public class GridGraph extends AbstractGraph
         this.rows = rows;
         this.cols = cols;
         this._size = rows * cols;
+        grid = new Node[_size];
         if(types.length != size())
             throw new IllegalArgumentException("length of types is not equal to grid size");
         for(int i=0; i < types.length; ++i) {
@@ -138,8 +145,19 @@ public class GridGraph extends AbstractGraph
         this.rows = rows;
         this.cols = cols;
         this._size = rows * cols;
+        grid = new Node[_size];
         for(int i=0; i < _size; ++i) {
             grid[i] = new Node(0, 1);
+        }
+    }
+
+    public GridGraph(GridGraph gridGraph) {
+        this.rows = gridGraph.getRows();
+        this.cols = gridGraph.getCols();
+        this._size = rows * cols;
+        grid = new Node[_size];
+        for(int i=0; i < _size; ++i) {
+            grid[i] = new Node(gridGraph.getNode(i));
         }
     }
 
@@ -147,6 +165,11 @@ public class GridGraph extends AbstractGraph
         grid[i * cols + j] = node;
         if(updateCallback != null)
             updateCallback.run(i, j);
+    }
+    synchronized public void update(int u, Node node) {
+        grid[u] = node;
+        if(updateCallback != null)
+            updateCallback.run(u / cols, u % cols);
     }
 
     public static String zeros = "0-SsGg";
