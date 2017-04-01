@@ -13,6 +13,7 @@ public class GridPanelCell
     protected Color color;
     protected int arrowX, arrowY;
     protected double circleRadius;
+    protected String toolTip;
 
     public Color getColor() {
         return color;
@@ -20,6 +21,7 @@ public class GridPanelCell
     public int getArrowX() {return arrowX;}
     public int getArrowY() {return arrowY;}
     public double getCircleRadius() {return circleRadius;}
+    public String getToolTip() {return toolTip;}
 
     public static Color complColor(Color c) {
         double brightness = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null)[2];
@@ -31,17 +33,18 @@ public class GridPanelCell
             return c.darker();
     }
 
-    public GridPanelCell(Color color, int arrowX, int arrowY, double circleRadius) {
+    public GridPanelCell(Color color, int arrowX, int arrowY, double circleRadius, String toolTip) {
         this.color = color;
         this.arrowX = arrowX;
         this.arrowY = arrowY;
         this.circleRadius = circleRadius;
+        this.toolTip = toolTip;
     }
     public GridPanelCell(GridPanelCell gpc) {
-        this(gpc.getColor(), gpc.getArrowX(), gpc.getArrowY(), gpc.getCircleRadius());
+        this(gpc.getColor(), gpc.getArrowX(), gpc.getArrowY(), gpc.getCircleRadius(), gpc.getToolTip());
     }
     public GridPanelCell() {
-        this(Color.WHITE, 0, 0, 0.0);
+        this(Color.WHITE, 0, 0, 0.0, "");
     }
 
     public GridPanelCell getCopy() {

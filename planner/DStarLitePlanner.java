@@ -248,6 +248,7 @@ public class DStarLitePlanner extends DStarLitePlannerHelper
         gpc.setColor(color);
         gpc.setArrowX(arrowX);
         gpc.setArrowY(arrowY);
+        gpc.setToolTip("g: " + getG(u) + "\nrhs: " + getRhs(u));
         return gpc;
     }
 }

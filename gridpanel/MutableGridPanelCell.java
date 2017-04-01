@@ -9,8 +9,8 @@ public class MutableGridPanelCell extends GridPanelCell
     public MutableGridPanelCell(GridPanelCell c) {
         super(c);
     }
-    public MutableGridPanelCell(Color color, int arrowX, int arrowY, double circleRadius) {
-        super(color, arrowX, arrowY, circleRadius);
+    public MutableGridPanelCell(Color color, int arrowX, int arrowY, double circleRadius, String toolTip) {
+        super(color, arrowX, arrowY, circleRadius, toolTip);
     }
     public MutableGridPanelCell() {
         super();
@@ -27,6 +27,9 @@ public class MutableGridPanelCell extends GridPanelCell
     }
     public void setCircleRadius(double circleRadius) {
         this.circleRadius = circleRadius;
+    }
+    public void setToolTip(String toolTip) {
+        this.toolTip = toolTip;
     }
     public GridPanelCell getCopy() {
         return new GridPanelCell(this);

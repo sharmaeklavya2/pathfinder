@@ -86,6 +86,14 @@ public class GridPanel extends JPanel
         };
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
+        setToolTipText(""); // this enables tooltips
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent e) {
+        int i = mouseCellIndex;
+        return "<html>" + i + " (" + i / cols + ", " + i % cols + ")<br>" +
+            cells[i].getToolTip().replace("\n", "<br>") + "</html>";
     }
 
     @Override

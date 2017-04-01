@@ -185,6 +185,7 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
         gpc.setColor(color);
         gpc.setArrowX(arrowX);
         gpc.setArrowY(arrowY);
+        gpc.setToolTip("dist: " + getDist(u) + "\nnext: " + getNext(u) + "\nstage: " + getStage(u));
         return gpc;
     }
 
