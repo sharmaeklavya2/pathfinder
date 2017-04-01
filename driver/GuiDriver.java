@@ -2,6 +2,7 @@ package driver;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 import java.awt.Color;
 
 import java.awt.event.ActionListener;
@@ -175,6 +176,8 @@ public abstract class GuiDriver
         statusPanel.add(replanLabel);
         statusPanel.add(posLabel);
 
+        Semaphore gridPanelSem = new Semaphore(1, true);
+
         // draw buttons panel
         JButton moveButton = new JButton("Move");
         class MoveActionListener implements ActionListener {
@@ -187,19 +190,26 @@ public abstract class GuiDriver
                 (new Thread("move_thread") {
                     @Override
                     public void run() {
-                        if(planner.getRobot().getPosition() != planner.getGoal())
-                            total_replan_time += planner.move(sensorRadius);
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                distanceLabel.setText("Distance covered: " + planner.getDistance());
-                                replanLabel.setText("Replanning time: " + total_replan_time);
-                                int pos = planner.getRobot().getPosition();
-                                posLabel.setText("Position: " + pos + "(" + (pos / gcols) + ", " + (pos % gcols) + ")");
-                                if(planner.getRobot().getPosition() == planner.getGoal())
-                                    moveButton.setEnabled(false);
-                            }
-                        });
+                        try {
+                            gridPanelSem.acquire();
+                            if(planner.getRobot().getPosition() != planner.getGoal())
+                                total_replan_time += planner.move(sensorRadius);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    distanceLabel.setText("Distance covered: " + planner.getDistance());
+                                    replanLabel.setText("Replanning time: " + total_replan_time);
+                                    int pos = planner.getRobot().getPosition();
+                                    posLabel.setText("Position: " + pos + "(" + (pos / gcols) + ", " + (pos % gcols) + ")");
+                                    if(planner.getRobot().getPosition() == planner.getGoal())
+                                        moveButton.setEnabled(false);
+                                }
+                            });
+                            gridPanelSem.release();
+                        }
+                        catch(InterruptedException e) {
+                            System.err.println("move_thread was interrupted");
+                        }
                     }
                 }).start();
             }
@@ -234,21 +244,28 @@ public abstract class GuiDriver
                 (new Thread("reset_thread") {
                     @Override
                     public void run() {
-                        int goal = planner.getGoal();
-                        planner = getPlanner(plannerType, start, goal, graph);
-                        planner.setCallback(nuc);
-                        planner.reset();
-                        total_replan_time = 0;
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                distanceLabel.setText("Distance covered: " + planner.getDistance());
-                                replanLabel.setText("Replanning time: " + total_replan_time);
-                                int pos = planner.getRobot().getPosition();
-                                posLabel.setText("Position: " + pos + "(" + (pos / gcols) + ", " + (pos % gcols) + ")");
-                                moveButton.setEnabled(true);
-                            }
-                        });
+                        try {
+                            gridPanelSem.acquire();
+                            int goal = planner.getGoal();
+                            planner = getPlanner(plannerType, start, goal, graph);
+                            planner.setCallback(nuc);
+                            planner.reset();
+                            total_replan_time = 0;
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    distanceLabel.setText("Distance covered: " + planner.getDistance());
+                                    replanLabel.setText("Replanning time: " + total_replan_time);
+                                    int pos = planner.getRobot().getPosition();
+                                    posLabel.setText("Position: " + pos + "(" + (pos / gcols) + ", " + (pos % gcols) + ")");
+                                    moveButton.setEnabled(true);
+                                }
+                            });
+                            gridPanelSem.release();
+                        }
+                        catch(InterruptedException e) {
+                            System.err.println("reset_thread was interrupted");
+                        }
                     }
                 }).start();
             }
