@@ -6,17 +6,20 @@ import java.awt.Stroke;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Ellipse2D;
 
 public class GridPanelCell
 {
     protected Color color;
     protected int arrowX, arrowY;
+    protected double circleRadius;
 
     public Color getColor() {
         return color;
     }
     public int getArrowX() {return arrowX;}
     public int getArrowY() {return arrowY;}
+    public double getCircleRadius() {return circleRadius;}
 
     public static Color complColor(Color c) {
         double brightness = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null)[2];
@@ -28,16 +31,17 @@ public class GridPanelCell
             return c.darker();
     }
 
-    public GridPanelCell(Color color, int arrowX, int arrowY) {
+    public GridPanelCell(Color color, int arrowX, int arrowY, double circleRadius) {
         this.color = color;
         this.arrowX = arrowX;
         this.arrowY = arrowY;
+        this.circleRadius = circleRadius;
     }
     public GridPanelCell(GridPanelCell gpc) {
-        this(gpc.getColor(), gpc.getArrowX(), gpc.getArrowY());
+        this(gpc.getColor(), gpc.getArrowX(), gpc.getArrowY(), gpc.getCircleRadius());
     }
     public GridPanelCell() {
-        this(Color.WHITE, 0, 0);
+        this(Color.WHITE, 0, 0, 0.0);
     }
 
     public GridPanelCell getCopy() {
@@ -64,6 +68,8 @@ public class GridPanelCell
         //g2d.setColor(Color.BLUE);
         Line2D line = new Line2D.Double(x+w/2, y+h/2, x+w*(1+arrowX)/2, y+h*(1+arrowY)/2);
         g2d.draw(line);
+        Ellipse2D ellipse = new Ellipse2D.Double(x+w*(1-circleRadius)/2, y+h*(1-circleRadius)/2, w*circleRadius, h*circleRadius);
+        g2d.fill(ellipse);
 
         g2d.setColor(defColor);
         g2d.setStroke(defStroke);

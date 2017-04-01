@@ -19,6 +19,7 @@ import graph.*;
 import planner.*;
 import gridpanel.GridPanel;
 import gridpanel.GridPanelCell;
+import gridpanel.MutableGridPanelCell;
 import robot.*;
 
 import java.lang.Thread;
@@ -43,7 +44,7 @@ public abstract class GuiDriver
             int grows = graph.getRows(), gcols = graph.getCols();
             for(int i=0; i<grows; ++i) {
                 for(int j=0; j<gcols; ++j) {
-                    setCell(i, j, planner.getGridPanelCell(i * gcols + j));
+                    setCell(i, j, getGridPanelCell(i * gcols + j));
                 }
             }
         }
@@ -55,6 +56,17 @@ public abstract class GuiDriver
             int type2 = type == 0 ? 1 : 0;
             graph.update(row, col, new GridGraph.Node(type2, node.getOcc()));
         }
+    }
+
+    private static GridPanelCell getGridPanelCell(int u, boolean onPath) {
+        MutableGridPanelCell cell = new MutableGridPanelCell(planner.getGridPanelCell(u, onPath));
+        int type = graph.getNode(u).getType();
+        if(type > 0)
+            cell.setCircleRadius(0.5);
+        return cell;
+    }
+    private static GridPanelCell getGridPanelCell(int u) {
+        return getGridPanelCell(u, false);
     }
 
     private static AbstractPlanner getPlanner(String name, int start, int goal, GridGraph graph) {
@@ -120,7 +132,7 @@ public abstract class GuiDriver
                 catch(InterruptedException e) {}
                 System.err.println("gguc(" + i + ", " + j + ")");
                 int u = i * graph.getCols() + j;
-                gridPanel.setCell(i, j, planner.getGridPanelCell(u));
+                gridPanel.setCell(i, j, getGridPanelCell(u));
             }
         };
         graph.setCallback(gguc);
@@ -134,7 +146,7 @@ public abstract class GuiDriver
                 }
                 catch(InterruptedException e) {}
                 //System.err.println("nuc(" + u + ")");
-                gridPanel.setCell(u, planner.getGridPanelCell(u));
+                gridPanel.setCell(u, getGridPanelCell(u));
             }
             @Override
             public void move(int u, int v) {
@@ -154,7 +166,7 @@ public abstract class GuiDriver
                         if(curr != -1) {
                             int goal = planner.getGoal();
                             while(curr != goal) {
-                                gridPanel.setCell(curr, planner.getGridPanelCell(curr, true));
+                                gridPanel.setCell(curr, getGridPanelCell(curr, true));
                                 curr = planner.getNext(curr);
                             }
                         }
@@ -225,7 +237,7 @@ public abstract class GuiDriver
                     public void run() {
                         for(int i=0; i<grows; ++i) {
                             for(int j=0; j<gcols; ++j) {
-                                gridPanel.setCell(i, j, planner.getGridPanelCell(i * graph.getCols() + j));
+                                gridPanel.setCell(i, j, getGridPanelCell(i * graph.getCols() + j));
                             }
                         }
                     }
@@ -314,6 +326,12 @@ public abstract class GuiDriver
                     fbr = new BufferedReader(new FileReader(words[1]));
                     graph.copyFrom(new GridGraph(fbr));
                     fbr.close();
+                    int rows = graph.getRows(), cols = graph.getCols();
+                    for(int i=0; i<rows; ++i) {
+                        for(int j=0; j<cols; ++j) {
+                            gridPanel.setCell(i, j, getGridPanelCell(i * cols + j));
+                        }
+                    }
                 }
             }
         }

@@ -5,6 +5,7 @@ import java.awt.Color;
 import static java.lang.Math.abs;
 
 import gridpanel.GridPanelCell;
+import gridpanel.MutableGridPanelCell;
 import graph.AbstractGraph;
 import graph.GenGraph;
 import graph.GridGraph;
@@ -180,7 +181,11 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
                 }
             }
         }
-        return new GridPanelCell(color, arrowX, arrowY);
+        MutableGridPanelCell gpc = new MutableGridPanelCell();
+        gpc.setColor(color);
+        gpc.setArrowX(arrowX);
+        gpc.setArrowY(arrowY);
+        return gpc;
     }
 
     public long replan()

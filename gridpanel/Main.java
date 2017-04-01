@@ -31,9 +31,9 @@ public class Main
                             GridPanelCell gpc = getCell(r, c);
                             if(gpc.color != Color.BLACK) {
                                 if(r == row && c == col)
-                                    setCell(r, c, new GridPanelCell(Color.BLACK, 0, 0));
+                                    setCell(r, c, new GridPanelCell(Color.BLACK, 0, 0, 0.5));
                                 else
-                                    setCell(r, c, new GridPanelCell(Color.LIGHT_GRAY, -dcols[j], -drows[i]));
+                                    setCell(r, c, new GridPanelCell(Color.LIGHT_GRAY, -dcols[j], -drows[i], 0.0));
                             }
                         }
                     }
