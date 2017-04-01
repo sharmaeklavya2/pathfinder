@@ -74,6 +74,9 @@ public abstract class GuiDriver
         if(name.equals("DijkstraPlanner")) {
             return new DijkstraPlanner(goal, robot);
         }
+        if(name.equals("DStarLitePlanner")) {
+            return new DStarLitePlanner(goal, robot);
+        }
         else {
             throw new RuntimeException("Invalid Planner type");
         }
@@ -87,6 +90,7 @@ public abstract class GuiDriver
 
     public static void run(String fpath, String plannerType, final int callbackSleep,
         int sensorRadius) throws IOException, GridGraph.CreateException
+
     {
         GUIUtil.setlf();
 
