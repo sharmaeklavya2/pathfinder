@@ -30,25 +30,33 @@ public class GridRobot implements Robot{
         this.graphLocal = new GridGraph(graph);
     }
 
-    public Set<Integer> getUpdatedNodes(int radius) {
-        int u = getPosition();
+    public List<Integer> getNearbyNodes(int u, int radius) {
         int rows = graphLocal.getRows();
         int cols = graphLocal.getCols();
         int ui = u / cols, uj = u % cols;
-        Set<Integer> output = new HashSet<Integer>();
+        List<Integer> output = new ArrayList<Integer>();
         for(int vi=ui-radius; vi <= ui+radius; ++vi) {
             if(vi >= 0 && vi < rows) {
                 for(int vj=uj-radius; vj <= uj+radius; ++vj) {
                     if(vj >= 0 && vj < cols) {
                         int v = vi * cols + vj;
-                        GridGraph.Node lnode = graphLocal.getNode(v);
-                        GridGraph.Node rnode = graphRemote.getNode(v);
-                        if(!lnode.isSame(rnode)) {
-                            output.add(v);
-                            graphLocal.update(v, rnode);
-                        }
+                        output.add(v);
                     }
                 }
+            }
+        }
+        return output;
+    }
+
+    public Set<Integer> getUpdatedNodes(int radius) {
+        Set<Integer> output = new HashSet<Integer>();
+        int u = getPosition();
+        for(int v: getNearbyNodes(u, radius)) {
+            GridGraph.Node lnode = graphLocal.getNode(v);
+            GridGraph.Node rnode = graphRemote.getNode(v);
+            if(!lnode.isSame(rnode)) {
+                output.addAll(getNearbyNodes(v, 1));
+                graphLocal.update(v, rnode);
             }
         }
         return output;
