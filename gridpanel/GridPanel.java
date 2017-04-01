@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import javax.swing.SwingUtilities;
 
 import java.lang.IllegalArgumentException;
 
@@ -25,7 +26,7 @@ public class GridPanel extends JPanel
     private Rectangle[] rects;
     private GridPanelCell[] cells;
     private int mouseCellIndex;
-    private boolean needsRepaint, needsRectsRecalc;
+    private boolean needsRectsRecalc;
     public static final int timerDelay = 50;
 
     public int getRows() {return rows;}
@@ -46,18 +47,6 @@ public class GridPanel extends JPanel
         cells = new GridPanelCell[cols * rows];
         for(int i=0; i<cells.length; ++i)
             cells[i] = new GridPanelCell();
-
-        Timer timer = new Timer(timerDelay, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                if(needsRepaint) {
-                    repaint();
-                    needsRepaint = false;
-                }
-            }
-        });
-        timer.start();
 
         MouseAdapter mouseHandler;
         mouseHandler = new MouseAdapter() {
@@ -145,7 +134,6 @@ public class GridPanel extends JPanel
         for(int i=0; i<cells.length; ++i)
             cells[i].draw2(g2d, rects[i], i == mouseCellIndex);
 
-        needsRepaint = false;
         g2d.dispose();
     }
 
@@ -154,7 +142,12 @@ public class GridPanel extends JPanel
     }
     public void setCell(int node, GridPanelCell gpc) {
         cells[node] = gpc.getCopy();
-        needsRepaint = true;
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                repaint();
+            }
+        });
     }
 
     public GridPanelCell getCell(int row, int col) {
