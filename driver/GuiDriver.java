@@ -8,7 +8,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JLabel;
 import javax.swing.BoxLayout;
+import java.awt.GridLayout;
 import javax.swing.SwingUtilities;
 
 import util.GUIUtil;
@@ -68,6 +70,7 @@ public abstract class GuiDriver
     private static GridPanel gridPanel;
     private static AbstractPlanner planner;
     private static int start=-1, goal=-1;
+    private static long total_replan_time = 0;
 
     public static void run(String fpath, String plannerType, final int callbackSleep,
         int sensorRadius) throws IOException, GridGraph.CreateException
@@ -161,6 +164,17 @@ public abstract class GuiDriver
         planner.setCallback(nuc);
         nuc.pathUpdate();
 
+        // draw status panel
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new GridLayout(1, 3));
+        JLabel distanceLabel = new JLabel("Distance covered: 0");
+        JLabel replanLabel = new JLabel("Replanning time: 0");
+        int pos = planner.getRobot().getPosition();
+        JLabel posLabel = new JLabel("Position: " + pos + "(" + (pos / gcols) + ", " + (pos % gcols) + ")");
+        statusPanel.add(distanceLabel);
+        statusPanel.add(replanLabel);
+        statusPanel.add(posLabel);
+
         // draw buttons panel
         JButton moveButton = new JButton("Move");
         class MoveActionListener implements ActionListener {
@@ -174,10 +188,14 @@ public abstract class GuiDriver
                     @Override
                     public void run() {
                         if(planner.getRobot().getPosition() != planner.getGoal())
-                            planner.move(sensorRadius);
+                            total_replan_time += planner.move(sensorRadius);
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
+                                distanceLabel.setText("Distance covered: " + planner.getDistance());
+                                replanLabel.setText("Replanning time: " + total_replan_time);
+                                int pos = planner.getRobot().getPosition();
+                                posLabel.setText("Position: " + pos + "(" + (pos / gcols) + ", " + (pos % gcols) + ")");
                                 if(planner.getRobot().getPosition() == planner.getGoal())
                                     moveButton.setEnabled(false);
                             }
@@ -220,9 +238,14 @@ public abstract class GuiDriver
                         planner = getPlanner(plannerType, start, goal, graph);
                         planner.setCallback(nuc);
                         planner.reset();
+                        total_replan_time = 0;
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
+                                distanceLabel.setText("Distance covered: " + planner.getDistance());
+                                replanLabel.setText("Replanning time: " + total_replan_time);
+                                int pos = planner.getRobot().getPosition();
+                                posLabel.setText("Position: " + pos + "(" + (pos / gcols) + ", " + (pos % gcols) + ")");
                                 moveButton.setEnabled(true);
                             }
                         });
@@ -263,7 +286,7 @@ public abstract class GuiDriver
         buttonPanel.add(exportButton);
 
         // draw grid
-        GUIUtil.makeGUI(plannerType, gridPanel, buttonPanel, null);
+        GUIUtil.makeGUI(plannerType, gridPanel, buttonPanel, statusPanel);
 
         BufferedReader inbr = new BufferedReader(new InputStreamReader(System.in));
         String[] words;
