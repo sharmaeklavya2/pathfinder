@@ -15,7 +15,7 @@ public abstract class AbstractPlanner
     }
 
     protected int goal;
-    protected int distance;
+    protected double distance;
     protected Callback callback;
 
     protected AbstractPlanner() {
