@@ -22,6 +22,7 @@ import java.lang.Thread;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 public abstract class GuiDriver
@@ -74,11 +75,12 @@ public abstract class GuiDriver
         GUIUtil.setlf();
 
         // get graph
-        BufferedReader br = new BufferedReader(new FileReader(fpath));
+        BufferedReader fbr = new BufferedReader(new FileReader(fpath));
         String s;
         ArrayList<String> lines = new ArrayList<String>();
-        while((s = br.readLine()) != null)
+        while((s = fbr.readLine()) != null)
             lines.add(s);
+        fbr.close();
         //System.err.println(lines);
         graph = new GridGraph(lines);
         int grows = graph.getRows(), gcols = graph.getCols();
@@ -262,6 +264,20 @@ public abstract class GuiDriver
 
         // draw grid
         GUIUtil.makeGUI(plannerType, gridPanel, buttonPanel, null);
+
+        BufferedReader inbr = new BufferedReader(new InputStreamReader(System.in));
+        String[] words;
+        while((s = inbr.readLine()) != null) {
+            words = s.split(" ");
+            if(words.length > 0) {
+                if(words[0].equals("replace")) {
+                    fbr = new BufferedReader(new FileReader(words[1]));
+                    graph.copyFrom(new GridGraph(fbr));
+                    fbr.close();
+                }
+            }
+        }
+        inbr.close();
     }
 
     public static void main(String[] args) throws IOException, GridGraph.CreateException {

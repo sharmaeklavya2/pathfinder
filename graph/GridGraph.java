@@ -161,6 +161,18 @@ public class GridGraph extends AbstractGraph
         }
     }
 
+    public void copyFrom(GridGraph gridGraph) throws CreateException {
+        if(gridGraph.getRows() != this.rows) {
+            throw new CreateException("number of rows don't match");
+        }
+        else if(gridGraph.getCols() != this.cols) {
+            throw new CreateException("number of columns don't match");
+        }
+        for(int i=0; i < _size; ++i) {
+            grid[i] = new Node(gridGraph.getNode(i));
+        }
+    }
+
     synchronized public void update(int i, int j, Node node) {
         grid[i * cols + j] = node;
         if(updateCallback != null)
