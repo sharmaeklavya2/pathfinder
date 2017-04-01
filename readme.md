@@ -10,12 +10,14 @@ This project's java code is split up into packages. Each package has a well-defi
 (Unfortunately there is somewhat tight coupling between the packages,
 so they can't be used independently without some modification.)
 
-* `graph`: Contains classes for representing graphs.
-* `planner`: Contains classes which represent path planning algorithms.
-* `gridpanel`: `gridpanel.GridPanel` is a class which extends `JPanel`
-  and can be used to draw GUI grids.
-* `driver`: Driver code which is supposed to be run by the end user.
-* `util`: Utilities.
+*  `graph`: Contains classes for representing graphs.
+*  `planner`: Contains classes which represent path planning algorithms.
+*  `robot`: Contains classes which represent an agent which has a local copy of a map,
+    an actuator to move about, and a sensor to detect changes in surroundings.
+*  `gridpanel`: `gridpanel.GridPanel` is a class which extends `JPanel`
+    and can be used to draw GUI grids.
+*  `driver`: Driver code which is supposed to be run by the end user.
+*  `util`: Utilities.
 
 There's also a directory named `sample_input`, which contains input files which can be fed to
 the application.
