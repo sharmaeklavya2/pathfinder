@@ -9,20 +9,19 @@ import dstar.DStarLite;
 
 import gridpanel.GridPanelCell;
 import gridpanel.MutableGridPanelCell;
-import graph.AbstractGraph;
 import graph.GridGraph;
 import planner.AbstractPlanner;
-import robot.Robot;
+import robot.GridRobot;
 
 public class TWDSLPlanner extends AbstractPlanner
 {
-    private Robot robot;
+    private GridRobot robot;
     private int start;
-    private AbstractGraph graph;
+    private GridGraph graph;
     private DStarLite dstar, rdstar;
     private DStarLite.Callback dstarCallback;
 
-    public Robot getRobot() {
+    public GridRobot getRobot() {
         return robot;
     }
     public int getStart() {
@@ -39,17 +38,17 @@ public class TWDSLPlanner extends AbstractPlanner
         };
     }
 
-    public TWDSLPlanner(int start, int goal, Robot robot, AbstractPlanner.Callback callback) {
+    public TWDSLPlanner(int start, int goal, GridRobot robot, AbstractPlanner.Callback callback) {
         this.goal = goal;
         this.start = start;
         setCallback(callback);
         resetRobot(robot);
     }
-    public TWDSLPlanner(int start, int goal, Robot robot) {
+    public TWDSLPlanner(int start, int goal, GridRobot robot) {
         this(start, goal, robot, new AbstractPlanner.Callback());
     }
 
-    public void resetRobot(Robot robot) {
+    public void resetRobot(GridRobot robot) {
     /* Reset Planner */
         this.robot = robot;
         graph = robot.getGraph();
