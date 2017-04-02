@@ -74,8 +74,11 @@ public abstract class GuiDriver
         if(name.equals("DijkstraPlanner")) {
             return new DijkstraPlanner(goal, robot);
         }
-        if(name.equals("DStarLitePlanner")) {
+        else if(name.equals("DStarLitePlanner")) {
             return new DStarLitePlanner(goal, robot);
+        }
+        else if(name.equals("TWDSLPlanner")) {
+            return new TWDSLPlanner(start, goal, robot);
         }
         else {
             throw new RuntimeException("Invalid Planner type");
@@ -163,6 +166,13 @@ public abstract class GuiDriver
                     @Override
                     public void run() {
                         System.err.println("pathUpdate()");
+                        if(planner instanceof TWDSLPlanner) {
+                            for(int i=0; i<grows; ++i) {
+                                for(int j=0; j<gcols; ++j) {
+                                    gridPanel.setCell(i, j, getGridPanelCell(i * graph.getCols() + j));
+                                }
+                            }
+                        }
                         int curr = planner.getRobot().getPosition();
                         if(curr != -1) {
                             curr = planner.getNext(curr);
