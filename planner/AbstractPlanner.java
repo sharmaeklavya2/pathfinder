@@ -12,6 +12,7 @@ public abstract class AbstractPlanner
         public void nodeUpdate(int u){}
         public void move(int u, int v){}
         public void pathUpdate(){}
+        public void fullUpdate(){}
     }
 
     protected int goal;
@@ -30,10 +31,16 @@ public abstract class AbstractPlanner
 
     public Callback getCallback() {return callback;}
     public void setCallback(Callback callback) {
-        this.callback = callback;
+        if(callback == null) {
+            this.callback = new AbstractPlanner.Callback();
+        }
+        else {
+            this.callback = callback;
+        }
     }
 
     public abstract Robot getRobot();
+    public abstract void resetRobot(Robot robot);
     public abstract int getNext(int u);
 
     public abstract void reset();
@@ -58,7 +65,7 @@ public abstract class AbstractPlanner
         return l;
     }
 
-    public long move(int radius) {
+    synchronized public long move(int radius) {
         int u = getRobot().getPosition();
         if(u == goal)
             throw new RuntimeException("Already at goal");

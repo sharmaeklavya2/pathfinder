@@ -49,6 +49,7 @@ abstract class DijkstraPlannerHelper extends AbstractPlanner
     private Stage stage[];
     private double dist[];
     private int next[];
+    private int size;
 
     public double getDist(int u) {return dist[u];}
     public int getNext(int u) {return next[u];}
@@ -72,10 +73,19 @@ abstract class DijkstraPlannerHelper extends AbstractPlanner
         this.stage[u] = stage;
         callback.nodeUpdate(u);
     }
+    protected void setAllDistNextStage(double dist, int next, Stage stage) {
+        for(int i=0; i<size; ++i) {
+            this.dist[i] = dist;
+            this.next[i] = next;
+            this.stage[i] = stage;
+        }
+        callback.fullUpdate();
+    }
 
     protected DijkstraPlannerHelper(int n)
     {
         super();
+        size = n;
         stage = new Stage[n];
         dist = new double[n];
         next = new int[n];
@@ -101,7 +111,7 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
     public Robot getRobot() {
         return robot;
     }
-    public void resetRobot(Robot robot) {
+    synchronized public void resetRobot(Robot robot) {
     /* Reset Planner */
         this.robot = robot;
         this.graph = robot.getGraph();
@@ -189,12 +199,10 @@ public class DijkstraPlanner extends DijkstraPlannerHelper
         return gpc;
     }
 
-    public long replan()
+    synchronized public long replan()
     {
         System.err.println("Replanning");
-        for(int i=0; i < graph.size(); ++i) {
-            setDistNextStage(i, Double.POSITIVE_INFINITY, -1, Stage.NEW);
-        }
+        setAllDistNextStage(Double.POSITIVE_INFINITY, -1, Stage.NEW);
         setDistNextStage(goal, 0, goal, Stage.OPEN);
         pq = new PriorityQueue<PQElem>();
         pq.add(new PQElem(goal, getDist(goal)));

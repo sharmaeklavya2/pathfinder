@@ -11,6 +11,7 @@ import gridpanel.GridPanelCell;
 import gridpanel.MutableGridPanelCell;
 import graph.GridGraph;
 import planner.AbstractPlanner;
+import robot.Robot;
 import robot.GridRobot;
 
 public class TWDSLPlanner extends AbstractPlanner
@@ -28,12 +29,16 @@ public class TWDSLPlanner extends AbstractPlanner
         return start;
     }
 
-    public void setCallback(Callback c) {
+    synchronized public void setCallback(Callback c) {
         callback = c;
         dstarCallback = new DStarLite.Callback() {
             @Override
             public void nodeUpdate(int u) {
                 callback.nodeUpdate(u);
+            }
+            @Override
+            public void fullUpdate() {
+                callback.fullUpdate();
             }
         };
     }
@@ -48,13 +53,29 @@ public class TWDSLPlanner extends AbstractPlanner
         this(start, goal, robot, new AbstractPlanner.Callback());
     }
 
+    public void resetRobot(Robot robot) {
+        if(robot instanceof GridRobot) {
+            resetRobot((GridRobot) robot);
+        }
+        else {
+            throw new IllegalArgumentException("TWDSLPlanner takes a GridRobot");
+        }
+    }
+
+    public static Object resetRobotLock = new Object();
+
     public void resetRobot(GridRobot robot) {
     /* Reset Planner */
-        this.robot = robot;
-        graph = robot.getGraph();
-        dstar = new DStarLite(goal, graph, dstarCallback);
-        rdstar = new DStarLite(start, graph, dstarCallback);
-        reset();
+        synchronized(resetRobotLock) {
+            this.robot = robot;
+            graph = robot.getGraph();
+            dstar = new DStarLite(goal, graph);
+            rdstar = new DStarLite(start, graph);
+            dstar.setCallback(dstarCallback);
+            rdstar.setCallback(dstarCallback);
+        }
+        callback.fullUpdate();
+        replan();
     }
 
     public void reset() {
@@ -73,13 +94,13 @@ public class TWDSLPlanner extends AbstractPlanner
         dstar.examineUpdates(l);
         rdstar.examineUpdates(l);
     }
-    public long replan()
+    synchronized public long replan()
     {
         System.err.println("Replanning");
         long pops;
         for(pops=0; dstar.replanIter(robot.getPosition()); ++pops);
         for(; rdstar.replanIter(goal); ++pops);
-        callback.pathUpdate();
+        callback.fullUpdate();
         return pops;
     }
 

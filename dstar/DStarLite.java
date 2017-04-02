@@ -9,10 +9,12 @@ import util.PQ;
 class DStarLiteHelper {
     public static class Callback {
         public void nodeUpdate(int u) {}
+        public void fullUpdate() {}
     }
 
     private double g[];
     private double rhs[];
+    private int size;
     private Callback callback;
 
     public Callback getCallback() {
@@ -23,6 +25,7 @@ class DStarLiteHelper {
     }
 
     protected DStarLiteHelper(int n, Callback callback) {
+        size = n;
         g = new double[n];
         rhs = new double[n];
         this.callback = callback;
@@ -46,6 +49,13 @@ class DStarLiteHelper {
         this.g[u] = g;
         this.rhs[u] = rhs;
         callback.nodeUpdate(u);
+    }
+    protected void setAllGRhs(double g, double rhs) {
+        for(int i=0; i<size; ++i) {
+            this.g[i] = g;
+            this.rhs[i] = rhs;
+        }
+        callback.fullUpdate();
     }
 }
 
@@ -78,9 +88,7 @@ public class DStarLite extends DStarLiteHelper {
 
     public void reset() {
         pq = new PQ();
-        for(int i=0; i < graph.size(); ++i) {
-            setGRhs(i, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        }
+        setAllGRhs(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
         setRhs(goal, 0);
         pq.push(goal, getMinGRhs(goal));
     }

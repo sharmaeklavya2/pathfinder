@@ -25,12 +25,21 @@ public class DStarLitePlanner extends AbstractPlanner
         return robot;
     }
 
-    public void setCallback(Callback c) {
-        callback = c;
+    synchronized public void setCallback(Callback c) {
+        if(c == null) {
+            callback = new AbstractPlanner.Callback();
+        }
+        else {
+            callback = c;
+        }
         dstarCallback = new DStarLite.Callback() {
             @Override
             public void nodeUpdate(int u) {
                 callback.nodeUpdate(u);
+            }
+            @Override
+            public void fullUpdate() {
+                callback.fullUpdate();
             }
         };
     }
@@ -44,12 +53,18 @@ public class DStarLitePlanner extends AbstractPlanner
         this(goal, robot, new AbstractPlanner.Callback());
     }
 
+    public static Object resetRobotLock = new Object();
+
     public void resetRobot(Robot robot) {
     /* Reset Planner */
-        this.robot = robot;
-        graph = robot.getGraph();
-        dstar = new DStarLite(goal, graph, dstarCallback);
-        reset();
+        synchronized(resetRobotLock) {
+            this.robot = robot;
+            graph = robot.getGraph();
+            dstar = new DStarLite(goal, graph);
+            dstar.setCallback(dstarCallback);
+        }
+        callback.fullUpdate();
+        replan();
     }
 
     public void reset() {
@@ -65,12 +80,13 @@ public class DStarLitePlanner extends AbstractPlanner
     protected void examineUpdates(Set<Integer> l) {
         dstar.examineUpdates(l);
     }
-    public long replan()
+    synchronized public long replan()
     {
         System.err.println("Replanning");
         long pops;
         for(pops=0; dstar.replanIter(robot.getPosition()); ++pops);
         callback.pathUpdate();
+        System.err.println("Replanned");
         return pops;
     }
 

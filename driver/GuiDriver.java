@@ -2,7 +2,6 @@ package driver;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
 import java.awt.Color;
 
 import java.awt.event.ActionListener;
@@ -91,6 +90,19 @@ public abstract class GuiDriver
     private static int start=-1, goal=-1;
     private static long total_replan_time = 0;
 
+    public static void drawPath(int curr) {
+        if(curr != -1) {
+            curr = planner.getNext(curr);
+        }
+        if(curr != -1) {
+            int goal = planner.getGoal();
+            while(curr != goal) {
+                gridPanel.setCell(curr, getGridPanelCell(curr, true));
+                curr = planner.getNext(curr);
+            }
+        }
+    }
+
     public static void run(String fpath, String plannerType, final int callbackSleep,
         int sensorRadius) throws IOException, GridGraph.CreateException
 
@@ -166,24 +178,29 @@ public abstract class GuiDriver
                     @Override
                     public void run() {
                         System.err.println("pathUpdate()");
-                        if(planner instanceof TWDSLPlanner) {
-                            for(int i=0; i<grows; ++i) {
-                                for(int j=0; j<gcols; ++j) {
-                                    gridPanel.setCell(i, j, getGridPanelCell(i * graph.getCols() + j));
-                                }
+                        int curr = planner.getRobot().getPosition();
+                        drawPath(curr);
+                    }
+                }).start();
+            }
+            @Override
+            public void fullUpdate() {
+                try {
+                    if(callbackSleep > 0)
+                        Thread.sleep(callbackSleep);
+                }
+                catch(InterruptedException e) {}
+                (new Thread("pathUpdate_thread") {
+                    @Override
+                    public void run() {
+                        System.err.println("fullUpdate()");
+                        for(int i=0; i<grows; ++i) {
+                            for(int j=0; j<gcols; ++j) {
+                                gridPanel.setCell(i, j, getGridPanelCell(i * graph.getCols() + j));
                             }
                         }
                         int curr = planner.getRobot().getPosition();
-                        if(curr != -1) {
-                            curr = planner.getNext(curr);
-                        }
-                        if(curr != -1) {
-                            int goal = planner.getGoal();
-                            while(curr != goal) {
-                                gridPanel.setCell(curr, getGridPanelCell(curr, true));
-                                curr = planner.getNext(curr);
-                            }
-                        }
+                        drawPath(curr);
                     }
                 }).start();
             }
@@ -202,8 +219,6 @@ public abstract class GuiDriver
         statusPanel.add(replanLabel);
         statusPanel.add(posLabel);
 
-        Semaphore gridPanelSem = new Semaphore(1, true);
-
         // draw buttons panel
         JButton moveButton = new JButton("Move");
         class MoveActionListener implements ActionListener {
@@ -216,26 +231,19 @@ public abstract class GuiDriver
                 (new Thread("move_thread") {
                     @Override
                     public void run() {
-                        try {
-                            gridPanelSem.acquire();
-                            if(planner.getRobot().getPosition() != planner.getGoal())
-                                total_replan_time += planner.move(sensorRadius);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    distanceLabel.setText("Distance covered: " + planner.getDistance());
-                                    replanLabel.setText("Replanning time: " + total_replan_time);
-                                    int pos = planner.getRobot().getPosition();
-                                    posLabel.setText("Position: " + pos + "(" + (pos / gcols) + ", " + (pos % gcols) + ")");
-                                    if(planner.getRobot().getPosition() == planner.getGoal())
-                                        moveButton.setEnabled(false);
-                                }
-                            });
-                            gridPanelSem.release();
-                        }
-                        catch(InterruptedException e) {
-                            System.err.println("move_thread was interrupted");
-                        }
+                        if(planner.getRobot().getPosition() != planner.getGoal())
+                            total_replan_time += planner.move(sensorRadius);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                distanceLabel.setText("Distance covered: " + planner.getDistance());
+                                replanLabel.setText("Replanning time: " + total_replan_time);
+                                int pos = planner.getRobot().getPosition();
+                                posLabel.setText("Position: " + pos + "(" + (pos / gcols) + ", " + (pos % gcols) + ")");
+                                if(planner.getRobot().getPosition() == planner.getGoal())
+                                    moveButton.setEnabled(false);
+                            }
+                        });
                     }
                 }).start();
             }
@@ -270,28 +278,19 @@ public abstract class GuiDriver
                 (new Thread("reset_thread") {
                     @Override
                     public void run() {
-                        try {
-                            gridPanelSem.acquire();
-                            int goal = planner.getGoal();
-                            planner = getPlanner(plannerType, start, goal, graph);
-                            planner.setCallback(nuc);
-                            planner.reset();
-                            total_replan_time = 0;
-                            SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    distanceLabel.setText("Distance covered: " + planner.getDistance());
-                                    replanLabel.setText("Replanning time: " + total_replan_time);
-                                    int pos = planner.getRobot().getPosition();
-                                    posLabel.setText("Position: " + pos + "(" + (pos / gcols) + ", " + (pos % gcols) + ")");
-                                    moveButton.setEnabled(true);
-                                }
-                            });
-                            gridPanelSem.release();
-                        }
-                        catch(InterruptedException e) {
-                            System.err.println("reset_thread was interrupted");
-                        }
+                        int goal = planner.getGoal();
+                        planner.resetRobot(new GridGraphRobot(graph, start));
+                        total_replan_time = 0;
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                distanceLabel.setText("Distance covered: " + planner.getDistance());
+                                replanLabel.setText("Replanning time: " + total_replan_time);
+                                int pos = planner.getRobot().getPosition();
+                                posLabel.setText("Position: " + pos + "(" + (pos / gcols) + ", " + (pos % gcols) + ")");
+                                moveButton.setEnabled(true);
+                            }
+                        });
                     }
                 }).start();
             }
