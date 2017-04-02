@@ -15,6 +15,7 @@
             <src path="robot" />
             <src path="planner" />
             <src path="driver" />
+            <src path="dstar" />
             <src path="util" />
         </javac>
     </target>
