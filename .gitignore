@@ -3,6 +3,8 @@
 __pycache__/
 /README.html
 /readme.html
+/docs/
+/doc/
 *.class
 *.exe
 .ant-*

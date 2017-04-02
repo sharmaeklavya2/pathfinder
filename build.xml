@@ -20,4 +20,8 @@
         </javac>
     </target>
 
+    <target name="doc">
+        <javadoc destdir="doc" />
+    </target>
+
 </project>

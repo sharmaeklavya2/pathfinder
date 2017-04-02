@@ -36,6 +36,8 @@ Once you have `ant`, run `ant build` in the project's root directory.
 If you don't want to install `ant`, you can view `build.xml` and write appropriate
 `javac` commands yourself.
 
+Run `ant doc` to generate documentation in `doc/`.
+
 ## How to run
 
 To run a text-based application, you can run:
