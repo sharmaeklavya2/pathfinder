@@ -16,7 +16,7 @@ so they can't be used independently without some modification.)
     an actuator to move about, and a sensor to detect changes in surroundings.
 *  `gridpanel`: `gridpanel.GridPanel` is a class which extends `JPanel`
     and can be used to draw GUI grids.
-*  `driver`: Driver code which is supposed to be run by the end user.
+*  `driver`: Driver modules which are supposed to be run by the end user.
 *  `util`: Utilities.
 
 There's also a directory named `sample_input`, which contains input files which can be fed to
@@ -35,6 +35,8 @@ Once you have `ant`, run `ant build` in the project's root directory.
 
 If you don't want to install `ant`, you can view `build.xml` and write appropriate
 `javac` commands yourself.
+
+## Documentation
 
 Run `ant doc` to generate documentation in `doc/`.
 
