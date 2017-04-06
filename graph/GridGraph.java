@@ -12,6 +12,26 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+/** An undirected graph where nodes are arranged as a grid.
+
+    Each node has:
+    <ul>
+    <li>a row number ({@code i}).</li>
+    <li>a column number ({@code j}).</li>
+    <li>a node number ({@code i * columns + j}).</li>
+    <li>a type.</li>
+    <li>an occupancy value.</li>
+    </ul>
+
+    For two distinct nodes to be adjacent:
+    <ul>
+    <li>Their column numbers should differ by at most 1.</li>
+    <li>Their row numbers should differ by at most 1.</li>
+    <li>Their type should be the same.</li>
+    </ul>
+
+    The weight of an edge is determined by occupancy values of its endpoints.
+*/
 public class GridGraph extends AbstractGraph
 {
     public static class Node
@@ -41,11 +61,13 @@ public class GridGraph extends AbstractGraph
         }
     }
 
+    /** Exception thrown from constructor. */
     public static class CreateException extends Exception
     {
         public CreateException(String s) {super(s);}
     }
 
+    /** Callback object which is called whenever the graph changes. */
     public static abstract class UpdateCallback {
         public abstract void run(int i, int j);
     }
@@ -55,8 +77,11 @@ public class GridGraph extends AbstractGraph
     private Node[] grid;
     private UpdateCallback updateCallback;
 
+    /** Number of rows. */
     public int getRows() {return rows;}
+    /** Number of columns. */
     public int getCols() {return cols;}
+    /** Size of graph, which is rows &times; columns. */
     public int size() {return _size;}
     public Node getNode(int i, int j) {return grid[i * cols + j];}
     public Node getNode(int u) {return grid[u];}
@@ -68,6 +93,7 @@ public class GridGraph extends AbstractGraph
         this.updateCallback = callback;
     }
 
+    /** Squared distance between nodes, -1 if nodes are not adjacent, 0 if nodes are the same. */
     synchronized public long norm(int src, int dst) {
         int si = src / cols, sj = src % cols;
         int di = dst / cols, dj = dst % cols;
@@ -78,9 +104,11 @@ public class GridGraph extends AbstractGraph
             return -1;
     }
 
+    /** Difference between row numbers. */
     public int diffI(int u, int v) {
         return v / cols - u / cols;
     }
+    /** Difference between column numbers. */
     public int diffJ(int u, int v) {
         return v % cols - u % cols;
     }
@@ -184,6 +212,7 @@ public class GridGraph extends AbstractGraph
             updateCallback.run(u / cols, u % cols);
     }
 
+    /** String of characters which are interpreted as nodes of type 0 when reading from a {@link BufferedReader}. */
     public static String zeros = "0-SsGg";
 
     public static Node nodeFromChar(char ch) throws CreateException {
@@ -267,6 +296,7 @@ public class GridGraph extends AbstractGraph
         return new String(a);
     }
 
+    /** Read a {@link GridGraph} from a file and print its {@link GenGraph} representation. */
     public static void main(String[] args) throws IOException, CreateException {
         String usage = "usage: java graphs.GridGraph [file]";
         GridGraph graph = new GridGraph(CmdUtil.getBrFromArgs(args, usage, true));
