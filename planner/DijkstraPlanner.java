@@ -92,6 +92,7 @@ abstract class DijkstraPlannerHelper extends AbstractPlanner
     }
 }
 
+/** Path-planner which uses Dijkstra's algorithm. */
 public class DijkstraPlanner extends DijkstraPlannerHelper
 {
     private PriorityQueue<PQElem> pq;

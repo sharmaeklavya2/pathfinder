@@ -14,6 +14,7 @@ import graph.GridGraph;
 import planner.AbstractPlanner;
 import robot.Robot;
 
+/** Path-planner which uses the D*-lite algorithm. */
 public class DStarLitePlanner extends AbstractPlanner
 {
     private Robot robot;

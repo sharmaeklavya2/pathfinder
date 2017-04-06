@@ -14,6 +14,7 @@ import planner.AbstractPlanner;
 import robot.Robot;
 import robot.GridRobot;
 
+/** Path-planner which uses the Two-Way D*-lite algorithm. */
 public class TWDSLPlanner extends AbstractPlanner
 {
     private GridRobot robot;
