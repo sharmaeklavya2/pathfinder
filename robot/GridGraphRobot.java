@@ -7,6 +7,7 @@ import graph.GridGraph;
 import graph.Edge;
 import static java.lang.Math.abs;
 
+/** A class which implements {@link GridRobot} using {@link GridGraph} to store the local copy of the graph. */
 public class GridGraphRobot implements GridRobot {
     protected GridGraph graphLocal, graphRemote;
     protected int position;

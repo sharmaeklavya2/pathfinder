@@ -7,6 +7,7 @@ import graph.GenGraph;
 import graph.Edge;
 import static java.lang.Math.abs;
 
+/** A class which implements {@link Robot} using {@link GenGraph} to store the local copy of the graph. */
 public class GraphRobot implements Robot{
     protected GenGraph graphLocal;
     protected AbstractGraph graphRemote;
