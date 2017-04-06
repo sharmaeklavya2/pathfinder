@@ -70,9 +70,9 @@ public class DStarLite extends DStarLiteHelper {
         }
     }
 
-    private int goal;
-    private AbstractGraph graph;
-    private PQ pq;
+    protected int goal;
+    protected AbstractGraph graph;
+    protected PQ pq;
 
     public DStarLite(int goal, AbstractGraph graph, Callback callback) {
         super(graph.size(), callback);
@@ -84,7 +84,7 @@ public class DStarLite extends DStarLiteHelper {
         this(goal, graph, new Callback());
     }
 
-    public double getGoal(int u) {return goal;}
+    public int getGoal(int u) {return goal;}
 
     public void reset() {
         pq = new PQ();
