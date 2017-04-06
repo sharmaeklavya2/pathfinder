@@ -21,7 +21,7 @@
     </target>
 
     <target name="doc">
-        <javadoc destdir="doc" />
+        <javadoc destdir="doc" sourcepath="." />
     </target>
 
 </project>
