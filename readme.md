@@ -1,6 +1,12 @@
 # PathFinder
 
-This java application demonstrates path planning algorithms.
+PathFinder is a framework for implementing, testing, visualizing and benchmarking
+path-planning algorithms which involve dynamic replanning.
+
+Path-planning is a process in which a suitable path has to be determined
+from a source to destination given a map of a region in an appropriate form.
+Dynamic replanning means the ability to modify the path
+when new obstacles are detected while following the path.
 
 <img src="screenshot.png" alt="Screenshot"/>
 
